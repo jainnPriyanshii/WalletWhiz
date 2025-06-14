@@ -1,14 +1,122 @@
-import { View, Text ,Button} from 'react-native'
+import { View, Text ,Button,StyleSheet, KeyboardAvoidingView,TextInput,TouchableOpacity} from 'react-native'
 import React from 'react'
+import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
+import {wp,hp} from '../../utils/Common'
+
 const RegisterScreen = () => {
     const navigation = useNavigation();
+    const [username,setUsername]=useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = () => {
+      navigation.navigate('WalletWhizHome')
+    }
   return (
+    <KeyboardAvoidingView style={styles.container}>
     <View>
-      <Text>RegisterScreen</Text>
-       <Button title='clickme' onPress={()=> navigation.navigate('WalletWhizHome')}> </Button>
+      <Text style={styles.Headtext1}>Let's Get Started</Text>
+      <Text style={styles.Headtext}>create an Account to track your expenses</Text>
+      <View>
+        <Text style={styles.label}>Username</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter Username"
+                value={username}
+                onChangeText={setUsername}
+              />
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter email"
+                value={email}
+                onChangeText={setEmail}
+              />
+             
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Password please"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+             \
+              <TouchableOpacity style = {styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttontext}>Register</Text>
+              </TouchableOpacity>
+              
+            </View>
+            <Text style={{ textAlign: 'center', marginTop: hp(5) ,color:'#87C184'}}>
+                  Already have an account?{" "}
+                  <Text
+                    style={{ color: '#2AFBB7', textDecorationLine: 'underline' }}
+                    onPress={() => navigation.navigate('Login')}
+                  >
+                    Login
+                  </Text>
+                   </Text>
+               
+   
     </View>
+    </KeyboardAvoidingView>
   )
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: '#192019',
+  },
+  Headtext1:{
+    fontSize:30,
+    color:'#fff',
+    fontWeight:'bold',
+    marginBottom:hp(1),
+    marginTop:hp(5)
+   
+  },
+  Headtext:{
+    fontSize:16,
+    color:'#87C184',
+    fontWeight:'bold',
+    marginBottom:hp(5),
+  //  textAlign:'center'
+  },
+  
+   label: {
+      fontSize: wp(4),
+      marginBottom: hp(0.5),
+      fontWeight: "bold",
+      color:'#415B46'
+    },
+  
+    input: {
+      height: hp(5),
+      borderColor: "#ddd",
+      borderWidth: 1,
+      marginBottom: hp(1.5),
+      padding: wp(2.5),
+      borderRadius: wp(1.5),
+      color:'#fff'
+    },
+     button:{
+    height:hp(5),
+    // width:wp(),
+    backgroundColor:'#415B48',
+    borderRadius:10,
+    marginTop:hp(0.5),
+    
+  },
+
+  buttontext:{
+ color:'#fff',
+  textAlign:'center',
+  paddingTop:hp(0.6),
+  fontWeight:'bold',
+  fontSize:18,
+  },
+})
 
 export default RegisterScreen

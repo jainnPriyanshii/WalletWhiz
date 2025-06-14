@@ -4,11 +4,15 @@ import HomeScreen from "../../WalletWhiz/Components/Screens/HomeScreen";
 import StatisticsScreen from "../../WalletWhiz/Components/Screens/StatisticsScreen";
 import WalletScreen from "../../WalletWhiz/Components/Screens/WalletScreen";
 import ProfileScreen from "../../WalletWhiz/Components/Screens/ProfileScreen";
+// import {BlurView }from 'expo-blur'
 const Tab = createBottomTabNavigator();
 
 const MyTabs = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{tabBarActiveTintColor:'#87C184',tabBarStyle:{
+      backgroundColor:'#192019'
+    }
+      }}>
       <Tab.Screen
        name="home" 
        component={HomeScreen} 
