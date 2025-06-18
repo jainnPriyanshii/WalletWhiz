@@ -2,8 +2,14 @@ import { View, Text, StyleSheet,TouchableOpacity, FlatList } from "react-native"
 import React from "react";
 import { wp, hp } from "../../utils/Common";
 import Icon from "react-native-vector-icons/Feather";
+import { useNavigation } from "@react-navigation/native";
 
-const WalletScreen = () => {
+
+const WalletScreen = () => { 
+  const navigation = useNavigation();
+  const handleClick = () => {
+      navigation.navigate('AddWallet')
+    }
   return (
     <View style={styles.container}>
       <View style={styles.balance}>
@@ -13,7 +19,7 @@ const WalletScreen = () => {
 
       <View style={styles.Walletcontainer}>
         <Text style={styles.walletText}>My Wallets</Text>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={handleClick}>
         <Icon name="plus" size={18} color="#000" />
       </TouchableOpacity>
       </View>

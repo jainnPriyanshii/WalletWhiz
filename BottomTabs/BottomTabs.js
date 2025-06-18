@@ -4,10 +4,52 @@ import HomeScreen from "../../WalletWhiz/Components/Screens/HomeScreen";
 import StatisticsScreen from "../../WalletWhiz/Components/Screens/StatisticsScreen";
 import WalletScreen from "../../WalletWhiz/Components/Screens/WalletScreen";
 import ProfileScreen from "../../WalletWhiz/Components/Screens/ProfileScreen";
-// import {BlurView }from 'expo-blur'
+import NewTransaction from "../../WalletWhiz/Components/Screens/SubScreens/NewTransaction";
+import AddWallet from "../../WalletWhiz/Components/Screens/SubScreens/AddWallet";
+import EditProfile from "../../WalletWhiz/Components/Screens/SubScreens/EditProfile";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+
+
+
+const Stack = createNativeStackNavigator();
+
+function WalletStackScreen () {
+  return(
+     <Stack.Navigator screenOptions={{headerShown:false}}>
+      <Stack.Screen name="Wallet" component={WalletScreen} />
+      <Stack.Screen name="AddWallet" component={AddWallet} />
+      
+      </Stack.Navigator>
+  )
+
+}
+
+function ProfileStackScreen() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfile} />
+    </Stack.Navigator>
+  );
+}
+
+
+
+function HomeStackScreen() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="NewTransaction" component={NewTransaction} />
+    </Stack.Navigator>
+  );
+}
+
+
 const Tab = createBottomTabNavigator();
 
-const MyTabs = () => {
+// const MyTabs = () => {
+  function MyTabs () {
   return (
     <Tab.Navigator screenOptions={{tabBarActiveTintColor:'#87C184',tabBarStyle:{
       backgroundColor:'#192019'
@@ -15,7 +57,7 @@ const MyTabs = () => {
       }}>
       <Tab.Screen
        name="home" 
-       component={HomeScreen} 
+       component={HomeStackScreen} 
        options={{
         title: "Home",
           tabBarIcon: ({ color }) => (
@@ -34,7 +76,7 @@ const MyTabs = () => {
        }}
        />
     
-      <Tab.Screen name="wallet" component={WalletScreen} 
+      <Tab.Screen name="wallet" component={WalletStackScreen} 
       options={{
         title: "Wallet",
           tabBarIcon: ({ color }) => (
@@ -45,7 +87,7 @@ const MyTabs = () => {
        />
       
       
-      <Tab.Screen name="profile" component={ProfileScreen} 
+      <Tab.Screen name="profile" component={ProfileStackScreen} 
        options={{
         title: "Profile",
           tabBarIcon: ({ color }) => (

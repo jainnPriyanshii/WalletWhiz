@@ -1,8 +1,14 @@
-import { View, Text, StyleSheet, FlatList, SafeAreaView } from 'react-native'
+import { View, Text, StyleSheet, FlatList, SafeAreaView,TouchableOpacity } from 'react-native'
 import React from 'react'
 import {hp,wp} from '../../utils/Common'
+import Icon from "react-native-vector-icons/Feather";
+import { useNavigation } from '@react-navigation/native';
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+  const handleClick = () => {
+      navigation.navigate('NewTransaction')
+    }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.nameContainer}>
@@ -30,10 +36,14 @@ const HomeScreen = () => {
     </View>
   </View>
       </View>
-      <View>
+      <View style={styles.transactionContainer}>
         <Text style={styles.transactionText}>Recent Transactions</Text>
+        <TouchableOpacity style={styles.addButton} onPress={handleClick}>
+                <Icon name="plus" size={18} color="#000" />
+              </TouchableOpacity>
+        </View>      
         <FlatList></FlatList>
-      </View>
+      
     </SafeAreaView>
   )
 }
@@ -151,15 +161,35 @@ expenseAmount: {
   fontSize: 16,
   marginTop: 2,
 },
+
+transactionContainer:{
+// justifyContent:'space-between',
+// alignItems:'center',
+flexDirection:'row',
+marginTop:hp(2),
+// marginLeft:wp(0)
+},
  transactionText:{
     fontSize: 20,
     color: "#edede9",
-    marginTop:hp(2),
+    // marginTop:hp(2),
     letterSpacing: wp(0.3),
     fontWeight: "bold",
-    marginLeft:wp(-35)
+    
 
-  }
+  },
+  addButton: {
+    backgroundColor: "#A5FF3F",
+    padding: 8,
+    borderRadius: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    width:wp(10),
+    height:hp(5),
+    marginLeft:wp(16),
+    // marginTop:hp(2)
+    
+  },
 })
 
 export default HomeScreen

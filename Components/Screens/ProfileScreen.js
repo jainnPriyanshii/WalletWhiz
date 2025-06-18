@@ -2,10 +2,12 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { hp, wp } from "../../utils/Common";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { useNavigation } from '@react-navigation/native'
 
 const ProfileScreen = () => {
+  const navigation = useNavigation();
   const menuItems = [
-    { label: "Edit Profile", icon: "person", bgColor: "#5A65EA" },
+    { label: "Edit Profile", icon: "person", bgColor: "#5A65EA",onPress: () => navigation.navigate("EditProfile") },
     { label: "Settings", icon: "settings", bgColor: "#3B945E" },
     { label: "Privacy Policy", icon: "lock", bgColor: "#555555" },
     { label: "Logout", icon: "power-settings-new", bgColor: "#D24545" },
@@ -23,7 +25,8 @@ const ProfileScreen = () => {
       <Text style={styles.email}>priyanshijain664@gmail</Text>
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.menuItem}>
+          <TouchableOpacity key={index} style={styles.menuItem} onPress={item.onPress}
+>
             <View
               style={[styles.iconContainer, { backgroundColor: item.bgColor }]}
             >
