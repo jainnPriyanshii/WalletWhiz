@@ -5,9 +5,11 @@ import RegisterScreen from "../WalletWhiz/Components/Screens/RegisterScreen"
 import MyTabs from "../WalletWhiz/BottomTabs/BottomTabs"
 import { NavigationContainer } from '@react-navigation/native';
 
+
 const Stack = createNativeStackNavigator();
 
 export default function App()  {
+
   return (
     <NavigationContainer>
     <Stack.Navigator screenOptions={{headerShown:false}}>

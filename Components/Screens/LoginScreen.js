@@ -1,3 +1,4 @@
+
 import {
   View,
   Text,
@@ -12,6 +13,12 @@ import React from "react";
 import {hp,wp} from '../../utils/Common'
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { signInWithEmailAndPassword } from 'firebase/auth';
+// import {signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+import { auth } from '../../firebaseConfig';
+
+
+
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
@@ -21,6 +28,15 @@ const LoginScreen = () => {
   const handleSubmit = () => {
     navigation.navigate("Register");
   };
+
+ const handlelogin = (email, password) => {
+  console.log("user login")
+  return signInWithEmailAndPassword(auth, email, password);
+  
+};
+
+
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -50,7 +66,7 @@ const LoginScreen = () => {
         {errors.password ? (
           <Text style={styles.errorText}>{errors.password}</Text>
         ) : null}
-        <TouchableOpacity style = {styles.button} onPress={handleSubmit}>
+        <TouchableOpacity style = {styles.button} onPress={handlelogin}>
           <Text style={styles.buttontext}>Login</Text>
         </TouchableOpacity>
         

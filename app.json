@@ -20,7 +20,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "permissions": [
+        "INTERNET",
+        "INTERNET"
+      ],
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.WalletWhiz"
     },
     "web": {
       "favicon": "./assets/favicon.png"

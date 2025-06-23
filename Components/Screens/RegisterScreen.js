@@ -3,6 +3,11 @@ import React from 'react'
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import {wp,hp} from '../../utils/Common'
+// import { createUserWithEmailAndPassword } from 'firebase/auth';
+// import {createUserWithEmailAndPassword} from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
+import { auth } from '../../firebaseConfig';
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+// import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const RegisterScreen = () => {
     const navigation = useNavigation();
@@ -10,9 +15,53 @@ const RegisterScreen = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = () => {
-      navigation.navigate('WalletWhizHome')
+    // const handleSubmit = () => {
+    //   navigation.navigate('WalletWhizHome')
+    // }
+
+  
+
+// const handleSignUp = async (email, password) => {
+//   try {
+//     await createUserWithEmailAndPassword(auth,email, password);
+//     console.log("User created!");
+//   } catch (error) {
+//     console.log("Error signing up:",error.code, error.message);
+//   }
+// };
+
+const handleSignup = async (email, password, username) => {
+  try {
+    console.log("Attempting to create user...");
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("User created, attempting to update profile...");
+
+    await updateProfile(user, {
+      displayName: username,
+    });
+
+    console.log("✅ User signed up:", user);
+  } catch (error) {
+    console.error("❌ Error signing up:");
+    if (error.code) { // Check if it's a Firebase error object
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
+        if (error.code === 'auth/network-request-failed') {
+            console.warn("It looks like there's a network issue. Please check your internet connection and try again.");
+        }
+        // Add other specific error handling here if you wish
+        // else if (error.code === 'auth/email-already-in-use') { ... }
+    } else { // Generic error
+        console.error("Non-Firebase error:", error);
     }
+  }
+};
+
+
+
+
+
   return (
     <KeyboardAvoidingView style={styles.container}>
     <View>
@@ -42,8 +91,8 @@ const RegisterScreen = () => {
                 value={password}
                 onChangeText={setPassword}
               />
-             \
-              <TouchableOpacity style = {styles.button} onPress={handleSubmit}>
+             
+              <TouchableOpacity style = {styles.button} onPress={handleSignup}>
                 <Text style={styles.buttontext}>Register</Text>
               </TouchableOpacity>
               
