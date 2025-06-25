@@ -25,9 +25,9 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
-  const handleSubmit = () => {
-    navigation.navigate("Register");
-  };
+  // const handleSubmit = () => {
+  //   navigation.navigate("Register");
+  // };
 
  const handlelogin = (email, password) => {
   console.log("user login")
@@ -66,7 +66,7 @@ const LoginScreen = () => {
         {errors.password ? (
           <Text style={styles.errorText}>{errors.password}</Text>
         ) : null}
-        <TouchableOpacity style = {styles.button} onPress={handlelogin}>
+        <TouchableOpacity style = {styles.button}  onPress={() => handlelogin(email, password)}>
           <Text style={styles.buttontext}>Login</Text>
         </TouchableOpacity>
         

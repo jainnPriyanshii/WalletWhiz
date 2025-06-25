@@ -3,14 +3,24 @@ import React from "react";
 import { hp, wp } from "../../utils/Common";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from '@react-navigation/native'
+import { signOut } from "firebase/auth";
+import {auth} from '../../firebaseConfig'
 
 const ProfileScreen = () => {
+  const handleLogout = async() =>{
+   try {
+    await signOut(auth)
+    console.log("User logged out")
+   } catch (error) {
+    console.error("Error while logging out:",error)
+   }
+  }
   const navigation = useNavigation();
   const menuItems = [
     { label: "Edit Profile", icon: "person", bgColor: "#5A65EA",onPress: () => navigation.navigate("EditProfile") },
     { label: "Settings", icon: "settings", bgColor: "#3B945E" },
     { label: "Privacy Policy", icon: "lock", bgColor: "#555555" },
-    { label: "Logout", icon: "power-settings-new", bgColor: "#D24545" },
+    { label: "Logout", icon: "power-settings-new", bgColor: "#D24545" , onPress:()=>{handleLogout()}},
   ];
   return (
     <View style={styles.container}>

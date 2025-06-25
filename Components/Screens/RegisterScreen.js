@@ -92,7 +92,7 @@ const handleSignup = async (email, password, username) => {
                 onChangeText={setPassword}
               />
              
-              <TouchableOpacity style = {styles.button} onPress={handleSignup}>
+              <TouchableOpacity style = {styles.button} onPress={()=>handleSignup(email,password,username)}>
                 <Text style={styles.buttontext}>Register</Text>
               </TouchableOpacity>
               
