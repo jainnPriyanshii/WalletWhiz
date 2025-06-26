@@ -1,12 +1,16 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useState,useEffect } from "react";
 import { hp, wp } from "../../utils/Common";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from '@react-navigation/native'
 import { signOut } from "firebase/auth";
 import {auth} from '../../firebaseConfig'
+import { getAuth,onAuthStateChanged } from "firebase/auth";
 
 const ProfileScreen = () => {
+  const [username , setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const Auth = getAuth();
   const handleLogout = async() =>{
    try {
     await signOut(auth)
@@ -15,6 +19,16 @@ const ProfileScreen = () => {
     console.error("Error while logging out:",error)
    }
   }
+
+  useEffect (()=>{
+      const unsubscribe = onAuthStateChanged(Auth,(user) =>{
+        if(user){
+          setUsername(user.displayName)
+          setEmail(user.email)
+        }
+      })
+      return unsubscribe;
+    },[])
   const navigation = useNavigation();
   const menuItems = [
     { label: "Edit Profile", icon: "person", bgColor: "#5A65EA",onPress: () => navigation.navigate("EditProfile") },
@@ -31,8 +45,8 @@ const ProfileScreen = () => {
           source={require("../../assets/icon.png")}
         />
       </View>
-      <Text style={styles.name}>Priyanshi jain</Text>
-      <Text style={styles.email}>priyanshijain664@gmail</Text>
+      <Text style={styles.name}>{username}</Text>
+      <Text style={styles.email}>{email}</Text>
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => (
           <TouchableOpacity key={index} style={styles.menuItem} onPress={item.onPress}

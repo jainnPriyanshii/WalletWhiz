@@ -1,19 +1,32 @@
 import { View, Text, StyleSheet, FlatList, SafeAreaView,TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {hp,wp} from '../../utils/Common'
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from '@react-navigation/native';
+import { getAuth,onAuthStateChanged } from 'firebase/auth';
 
 const HomeScreen = () => {
+  const [username,setUsername] = useState('');
+  const auth = getAuth();
   const navigation = useNavigation();
   const handleClick = () => {
       navigation.navigate('NewTransaction')
     }
+
+  useEffect (()=>{
+    const unsubscribe = onAuthStateChanged(auth,(user) =>{
+      if(user){
+        setUsername(user.displayName)
+        console.log(user.displayName)
+      }
+    })
+    return unsubscribe;
+  },[])
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.nameContainer}>
       <Text style={styles.helloText}>Hello,</Text>
-      <Text style={styles.nameText}>Priyanshi Jain</Text>
+      <Text style={styles.nameText}>{username}!</Text>
       </View>
       <View style={styles.balanceContainer}>
         <View style={styles.balanceHeader}>

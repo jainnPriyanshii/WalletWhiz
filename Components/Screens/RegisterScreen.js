@@ -3,11 +3,9 @@ import React from 'react'
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import {wp,hp} from '../../utils/Common'
-// import { createUserWithEmailAndPassword } from 'firebase/auth';
-// import {createUserWithEmailAndPassword} from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
 import { auth } from '../../firebaseConfig';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-// import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+
 
 const RegisterScreen = () => {
     const navigation = useNavigation();
@@ -15,20 +13,8 @@ const RegisterScreen = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // const handleSubmit = () => {
-    //   navigation.navigate('WalletWhizHome')
-    // }
+ 
 
-  
-
-// const handleSignUp = async (email, password) => {
-//   try {
-//     await createUserWithEmailAndPassword(auth,email, password);
-//     console.log("User created!");
-//   } catch (error) {
-//     console.log("Error signing up:",error.code, error.message);
-//   }
-// };
 
 const handleSignup = async (email, password, username) => {
   try {
