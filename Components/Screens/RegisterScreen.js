@@ -30,15 +30,14 @@ const handleSignup = async (email, password, username) => {
     console.log("✅ User signed up:", user);
   } catch (error) {
     console.error("❌ Error signing up:");
-    if (error.code) { // Check if it's a Firebase error object
+    if (error.code) { 
         console.error("Error code:", error.code);
         console.error("Error message:", error.message);
         if (error.code === 'auth/network-request-failed') {
             console.warn("It looks like there's a network issue. Please check your internet connection and try again.");
         }
-        // Add other specific error handling here if you wish
-        // else if (error.code === 'auth/email-already-in-use') { ... }
-    } else { // Generic error
+       
+    } else { 
         console.error("Non-Firebase error:", error);
     }
   }

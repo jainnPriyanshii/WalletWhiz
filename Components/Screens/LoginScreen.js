@@ -1,4 +1,3 @@
-
 import {
   View,
   Text,
@@ -14,7 +13,6 @@ import {hp,wp} from '../../utils/Common'
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { signInWithEmailAndPassword } from 'firebase/auth';
-// import {signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js';
 import { auth } from '../../firebaseConfig';
 
 
@@ -25,9 +23,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
-  // const handleSubmit = () => {
-  //   navigation.navigate("Register");
-  // };
+
 
  const handlelogin = (email, password) => {
   console.log("user login")
