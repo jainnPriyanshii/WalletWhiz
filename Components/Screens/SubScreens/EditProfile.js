@@ -9,15 +9,66 @@ import {
 } from "react-native";
 import React from "react";
 import { Feather } from "@expo/vector-icons";
+import * as ImagePicker from 'expo-image-picker';
 import { hp, wp } from "../../../utils/Common";
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import { auth } from '../../../firebaseConfig';
+import {reload, updateProfile } from "firebase/auth";
 
-const EditProfile = ({ profileImage, onEdit }) => {
+const EditProfile = ({onEdit}) => {
   const [username, setUsername] = useState("");
+  const[profileImage,setProfileImage] = useState(null)
+// To update the profile image and the username
+ const handleUpdateProfile = async () => {
+    const user = auth.currentUser;
+
+    if (user) {
+      try {
+        await updateProfile(user, {
+          displayName: username,
+        });
+        
+       await reload(user)
+       setUsername(user.displayName);
+       onEdit(user.displayName);
+       console.log("Profile updated successfully!",user.displayName);
+      } catch (error) {
+        console.error("Error updating profile:", error);
+      }
+    } else {
+      console.error("No user is signed in.");
+    }
+  }
+
+  // Expo image picker
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setProfileImage(uri); 
+    } else {
+      alert('You did not select any image.');
+    }
+  };
+
+  useEffect(() => {
+  (async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Permission to access media library is required!');
+    }
+  })();
+}, []);
+  
   return (
     <KeyboardAvoidingView style={styles.container}>
       <Text style={styles.Headtext}>EditProfile</Text>
-      <TouchableOpacity onPress={onEdit}>
+      <TouchableOpacity onPress={pickImageAsync}>
         <Image
           source={{ uri: profileImage || "https://via.placeholder.com/150" }}
           style={styles.profileImage}
@@ -36,7 +87,7 @@ const EditProfile = ({ profileImage, onEdit }) => {
         />
       </View>
       <View>
-        <TouchableOpacity style={styles.updtbutton}>
+        <TouchableOpacity style={styles.updtbutton} onPress={handleUpdateProfile}>
           <Text style={styles.buttontext}>Update profile</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.dltbutton}>

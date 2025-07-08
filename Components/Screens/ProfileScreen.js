@@ -26,6 +26,7 @@ const ProfileScreen = () => {
           setUsername(user.displayName)
           setEmail(user.email)
         }
+        <EditProfile onEdit={(newName) => setUsername(newName)} />
       })
       return unsubscribe;
     },[])
@@ -46,6 +47,7 @@ const ProfileScreen = () => {
         />
       </View>
       <Text style={styles.name}>{username}</Text>
+
       <Text style={styles.email}>{email}</Text>
       <View style={styles.menuContainer}>
         {menuItems.map((item, index) => (

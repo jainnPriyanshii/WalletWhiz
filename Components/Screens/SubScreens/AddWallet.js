@@ -1,10 +1,39 @@
-import { View, Text, StyleSheet, TextInput,TouchableOpacity, KeyboardAvoidingView } from "react-native";
-import React, { useState } from "react";
+import { View, Text, StyleSheet, TextInput,TouchableOpacity, KeyboardAvoidingView,Image } from "react-native";
+import React, { useState,useEffect } from "react";
 import { hp, wp } from "../../../utils/Common";
 import { Feather } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+
 
 const AddWallet = () => {
-const [walletname, SetWalletName] = useState("");
+  const [walleticon, setWalleticon] = useState(null); 
+  const [walletname, SetWalletName] = useState("");
+  // Expo image picker
+    const pickImageAsync = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+     
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        setWalleticon(uri); 
+      } else {
+        alert('You did not select any image.');
+      }
+    };
+  
+    useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Permission to access media library is required!');
+      }
+    })();
+  }, []);
+    
+
   return (
     <KeyboardAvoidingView style={styles.container}>
       <Text style={styles.Headtext}>New Wallet</Text>
@@ -17,15 +46,21 @@ const [walletname, SetWalletName] = useState("");
           onChangeText={SetWalletName}
         />
         <Text style={styles.label}>Set Icon</Text>
-        <TouchableOpacity style={styles.uploadBox}>
+        <TouchableOpacity style={styles.uploadBox} onPress={pickImageAsync}>
         <Feather name="upload" size={20} color="#ccc" />
         <Text style={styles.uploadText}>Upload Image</Text>
       </TouchableOpacity>
-        
+          {walleticon && (
+  <Image
+    source={{ uri:walleticon }}
+    style={{ width: 100, height: 100, borderRadius: 12, marginTop: 10 }}
+  />
+)}
         <TouchableOpacity style = {styles.button} >
                         <Text style={styles.buttontext}>Add Wallet</Text>
                       </TouchableOpacity>
-      </View>
+                    
+ </View>
 
     </KeyboardAvoidingView>
   );
