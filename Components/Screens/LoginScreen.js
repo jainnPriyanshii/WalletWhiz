@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
    textAlign:'center'
   },
   form: {
-    backgroundColor: "#87C184",
+    backgroundColor: "#82B08C",
     padding: wp(5),
     borderRadius: wp(2.5),
     shadowColor: "black",
