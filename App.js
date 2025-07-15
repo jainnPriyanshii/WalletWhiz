@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 import OnBoardScreen from "../WalletWhiz/Components/Screens/OnBoardScreen";
 import LoginScreen from "../WalletWhiz/Components/Screens/LoginScreen";
 import RegisterScreen from "../WalletWhiz/Components/Screens/RegisterScreen";
 import MyTabs from "../WalletWhiz/BottomTabs/BottomTabs";
-
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../WalletWhiz/WalletWhiz/firebaseConfig'; 
+import { AuthProvider} from './Context/AuthContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,10 +26,11 @@ export default function App() {
   }, []);
 
   if (loading) {
-    return null; // or splash screen
+    return null; 
   }
 
   return (
+    <AuthProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
@@ -44,5 +44,6 @@ export default function App() {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    </AuthProvider>
   );
 }

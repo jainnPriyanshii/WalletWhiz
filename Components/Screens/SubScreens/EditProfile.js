@@ -15,7 +15,7 @@ import { useState,useEffect } from "react";
 import { auth } from '../../../firebaseConfig';
 import {reload, updateProfile } from "firebase/auth";
 
-const EditProfile = ({onEdit}) => {
+const EditProfile = () => {
   const [username, setUsername] = useState("");
   const[profileImage,setProfileImage] = useState(null)
 // To update the profile image and the username
@@ -30,7 +30,7 @@ const EditProfile = ({onEdit}) => {
         
        await reload(user)
        setUsername(user.displayName);
-       onEdit(user.displayName);
+      //  onEdit(user.displayName);
        console.log("Profile updated successfully!",user.displayName);
       } catch (error) {
         console.error("Error updating profile:", error);

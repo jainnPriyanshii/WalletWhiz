@@ -3,11 +3,18 @@ import React, { useState,useEffect } from "react";
 import { hp, wp } from "../../../utils/Common";
 import { Feather } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-
+import { createWallet } from "../../../utils/WalletUtils";
+import {useAuth} from '../../../Context/AuthContext'
+import { useNavigation } from "@react-navigation/native";
+import {Wallet} from '../../../BottomTabs/BottomTabs'
 
 const AddWallet = () => {
   const [walleticon, setWalleticon] = useState(null); 
   const [walletname, SetWalletName] = useState("");
+  const [balance,SetBalance] = useState(0)
+  const { user } = useAuth();
+  const uid = user?.uid;
+  const navigation = useNavigation()
   // Expo image picker
     const pickImageAsync = async () => {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -33,6 +40,20 @@ const AddWallet = () => {
     })();
   }, []);
     
+  const newWallet = async () => {
+  try {
+    const walletData = {
+      name: walletname,
+      image: walleticon, 
+      balance: balance,
+    };
+
+    await createWallet(uid, walletData);
+    navigation.navigate('Wallet');
+  } catch (err) {
+    console.error('Error adding wallet:', err);
+  }
+};
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -45,6 +66,14 @@ const AddWallet = () => {
           value={walletname}
           onChangeText={SetWalletName}
         />
+     
+        <Text style={styles.label}>Balance</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter balance"
+          value={balance}
+          onChangeText={SetBalance}
+        />
         <Text style={styles.label}>Set Icon</Text>
         <TouchableOpacity style={styles.uploadBox} onPress={pickImageAsync}>
         <Feather name="upload" size={20} color="#ccc" />
@@ -56,7 +85,7 @@ const AddWallet = () => {
     style={{ width: 100, height: 100, borderRadius: 12, marginTop: 10 }}
   />
 )}
-        <TouchableOpacity style = {styles.button} >
+        <TouchableOpacity style = {styles.button} onPress={newWallet}>
                         <Text style={styles.buttontext}>Add Wallet</Text>
                       </TouchableOpacity>
                     
@@ -126,7 +155,7 @@ const styles = StyleSheet.create({
     height:hp(5),
     backgroundColor:'#415B48',
     borderRadius:10,
-    marginTop:hp(40),
+    marginTop:hp(25),
     
   },
 
