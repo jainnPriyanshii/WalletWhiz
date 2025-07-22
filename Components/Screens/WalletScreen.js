@@ -1,15 +1,36 @@
-import { View, Text, StyleSheet,TouchableOpacity, FlatList } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Image,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import { wp, hp } from "../../utils/Common";
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
+import { getWallets } from "../../utils/WalletUtils";
+import { db } from "../../firebaseConfig";
+import { getAuth } from "firebase/auth";
 
-
-const WalletScreen = () => { 
+const WalletScreen = () => {
   const navigation = useNavigation();
   const handleClick = () => {
-      navigation.navigate('AddWallet')
-    }
+    navigation.navigate("AddWallet");
+  };
+  const [wallets, SetWalletdata] = useState([]);
+
+  const uid = getAuth().currentUser?.uid;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!uid) return;
+      const data = await getWallets(uid);
+      SetWalletdata(data);
+    };
+    fetchData();
+  }, [uid]);
   return (
     <View style={styles.container}>
       <View style={styles.balance}>
@@ -20,11 +41,36 @@ const WalletScreen = () => {
       <View style={styles.Walletcontainer}>
         <Text style={styles.walletText}>My Wallets</Text>
         <TouchableOpacity style={styles.addButton} onPress={handleClick}>
-        <Icon name="plus" size={18} color="#000" />
-      </TouchableOpacity>
+          <Icon name="plus" size={18} color="#000" />
+        </TouchableOpacity>
       </View>
-      <FlatList/>   
-      {/* {WRITEEEE FLATLIST WHEN MAKING THE MODAL FOR THE NEW WALLET SO THAT TO DISPLAY THE LIST OF THE WALLETS} */}
+      <View style={{ padding: 16, marginTop: hp(2),color:'#ff'
+       }}>
+        <FlatList
+          data={wallets}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                padding: 20,
+                marginVertical: 2,
+                backgroundColor: '#2b3c2bff',
+                borderRadius: 20,
+                width: wp(90),
+                color:'#fff'
+              }}
+            >
+              {/* <Image source = {{uri:item.image}}
+          style = {{width: 50, height: 50, borderRadius: 25, marginRight: 12}}
+          /> */}
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                {item.name}
+              </Text>
+              <Text style={{ fontSize: 16 }}>₹{item.balance}</Text>
+            </View>
+          )}
+        />
+      </View>
     </View>
   );
 };
@@ -34,7 +80,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#192019",
     alignItems: "center",
-    
   },
 
   balance: {
@@ -62,31 +107,31 @@ const styles = StyleSheet.create({
     marginTop: hp(-3),
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    
-  flexDirection: "row", 
-  justifyContent: "space-between", 
-  
-  paddingHorizontal: wp(5),
-  paddingTop: hp(3), 
+
+    flexDirection: "row",
+    justifyContent: "space-between",
+
+    paddingHorizontal: wp(5),
+    paddingTop: hp(3),
   },
 
-  walletText:{
+  walletText: {
     fontSize: 20,
     color: "#e5e5e5",
-    
-    fontWeight:'bold'
+    marginTop: hp(25),
+
+    fontWeight: "bold",
   },
   addButton: {
     backgroundColor: "#A5FF3F",
-    padding: 8,
+    marginTop:hp(-2),
+    padding: 6,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    width:wp(10),
-    height:hp(5),
-    
+    width: wp(10),
+    height: hp(5),
   },
-  
 });
 
 export default WalletScreen;

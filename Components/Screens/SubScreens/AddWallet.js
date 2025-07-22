@@ -1,59 +1,68 @@
-import { View, Text, StyleSheet, TextInput,TouchableOpacity, KeyboardAvoidingView,Image } from "react-native";
-import React, { useState,useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Image,
+} from "react-native";
+import React, { useState, useEffect } from "react";
 import { hp, wp } from "../../../utils/Common";
-import { Feather } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+import { Feather } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { createWallet } from "../../../utils/WalletUtils";
-import {useAuth} from '../../../Context/AuthContext'
+import { useAuth } from "../../../Context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
-import {Wallet} from '../../../BottomTabs/BottomTabs'
+import { Wallet } from "../../../BottomTabs/BottomTabs";
 
 const AddWallet = () => {
-  const [walleticon, setWalleticon] = useState(null); 
+  const [walleticon, setWalleticon] = useState(null);
   const [walletname, SetWalletName] = useState("");
-  const [balance,SetBalance] = useState(0)
+  const [balance, SetBalance] = useState(0);
   const { user } = useAuth();
   const uid = user?.uid;
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   // Expo image picker
-    const pickImageAsync = async () => {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 1,
-      });
-     
-      if (!result.canceled) {
-        const uri = result.assets[0].uri;
-        setWalleticon(uri); 
-      } else {
-        alert('You did not select any image.');
-      }
-    };
-  
-    useEffect(() => {
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setWalleticon(uri);
+    } else {
+      alert("You did not select any image.");
+    }
+  };
+
+  useEffect(() => {
     (async () => {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Permission to access media library is required!');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to access media library is required!");
       }
     })();
   }, []);
-    
-  const newWallet = async () => {
-  try {
-    const walletData = {
-      name: walletname,
-      image: walleticon, 
-      balance: balance,
-    };
 
-    await createWallet(uid, walletData);
-    navigation.navigate('Wallet');
-  } catch (err) {
-    console.error('Error adding wallet:', err);
-  }
-};
+  const newWallet = async () => {
+    try {
+      const walletData = {
+        name: walletname,
+        image: walleticon,
+        balance: balance,
+      };
+
+      await createWallet(uid, walletData);
+      navigation.navigate("Wallet");
+    } catch (err) {
+      console.error("Error adding wallet:", err);
+    }
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -66,7 +75,7 @@ const AddWallet = () => {
           value={walletname}
           onChangeText={SetWalletName}
         />
-     
+
         <Text style={styles.label}>Balance</Text>
         <TextInput
           style={styles.input}
@@ -76,21 +85,19 @@ const AddWallet = () => {
         />
         <Text style={styles.label}>Set Icon</Text>
         <TouchableOpacity style={styles.uploadBox} onPress={pickImageAsync}>
-        <Feather name="upload" size={20} color="#ccc" />
-        <Text style={styles.uploadText}>Upload Image</Text>
-      </TouchableOpacity>
-          {walleticon && (
-  <Image
-    source={{ uri:walleticon }}
-    style={{ width: 100, height: 100, borderRadius: 12, marginTop: 10 }}
-  />
-)}
-        <TouchableOpacity style = {styles.button} onPress={newWallet}>
-                        <Text style={styles.buttontext}>Add Wallet</Text>
-                      </TouchableOpacity>
-                    
- </View>
-
+          <Feather name="upload" size={20} color="#ccc" />
+          <Text style={styles.uploadText}>Upload Image</Text>
+        </TouchableOpacity>
+        {walleticon && (
+          <Image
+            source={{ uri: walleticon }}
+            style={{ width: 100, height: 100, borderRadius: 12, marginTop: 10 }}
+          />
+        )}
+        <TouchableOpacity style={styles.button} onPress={newWallet}>
+          <Text style={styles.buttontext}>Add Wallet</Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 };
@@ -99,8 +106,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     backgroundColor: "#192019",
-
-    // alignItems: "center",
   },
   Headtext: {
     fontSize: 24,
@@ -115,7 +120,7 @@ const styles = StyleSheet.create({
     marginBottom: hp(1),
     // fontWeight: "bold",
     color: "#fff",
-    marginTop:hp(2)
+    marginTop: hp(2),
   },
 
   input: {
@@ -126,45 +131,44 @@ const styles = StyleSheet.create({
     padding: wp(2.5),
     borderRadius: wp(1.5),
     color: "#fff",
-    
   },
-  AddWalletForm:{
-    marginTop:hp(5),
-    height:hp(50),
+  AddWalletForm: {
+    marginTop: hp(5),
+    height: hp(50),
   },
 
-   uploadBox: {
+  uploadBox: {
     borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: '#555',
+    borderStyle: "dashed",
+    borderColor: "#555",
     paddingVertical: 16,
     borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
     gap: 8,
-    backgroundColor: '#222',
+    backgroundColor: "#222",
   },
   uploadText: {
-    color: '#ccc',
+    color: "#ccc",
     marginLeft: 8,
     fontSize: 16,
   },
 
-  button:{
-    height:hp(5),
-    backgroundColor:'#415B48',
-    borderRadius:10,
-    marginTop:hp(25),
-    
+  button: {
+    height: hp(5),
+    backgroundColor: "#415B48",
+    borderRadius: 10,
+    marginTop: hp(12),
+    position: "static",
   },
 
-  buttontext:{
- color:'#fff',
-  textAlign:'center',
-  paddingTop:hp(0.6),
-  fontWeight:'bold',
-  fontSize:18,
+  buttontext: {
+    color: "#fff",
+    textAlign: "center",
+    paddingTop: hp(0.6),
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });
 
