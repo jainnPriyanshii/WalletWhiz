@@ -20,6 +20,7 @@ const WalletScreen = () => {
     navigation.navigate("AddWallet");
   };
   const [wallets, SetWalletdata] = useState([]);
+  const [totalbalance,Settotalbalance] = useState();
 
   const uid = getAuth().currentUser?.uid;
 
@@ -28,13 +29,19 @@ const WalletScreen = () => {
       if (!uid) return;
       const data = await getWallets(uid);
       SetWalletdata(data);
+
+      // const total = data.reduce((sum,wallet) => sum+wallet.balance,0);
+      const total = data.reduce((sum, wallet) => {
+  return sum + Number(wallet.balance || 0);
+}, 0);
+      Settotalbalance(total)
     };
     fetchData();
   }, [uid]);
   return (
     <View style={styles.container}>
       <View style={styles.balance}>
-        <Text style={styles.balanceText}>₹4664.00</Text>
+        <Text style={styles.balanceText}>₹{Number(totalbalance || 0).toFixed(2)}</Text>
         <Text style={styles.TotalBalancetext}>Total Balance</Text>
       </View>
 

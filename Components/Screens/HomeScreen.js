@@ -29,6 +29,7 @@ const HomeScreen = () => {
     }
 
     const data = await getTransactions(uid, walletId);
+    console.log("walletid",walletId)
     console.log("Fetched transactions:", data);
     setTransactiondata(data);
   };
