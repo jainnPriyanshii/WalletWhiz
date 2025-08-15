@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
       if (firebaseUser) {
         setUser(firebaseUser);
         await AsyncStorage.setItem('userId', firebaseUser.uid);
-        await saveUserToFirestore(firebaseUser); // Keep Firestore updated
+        await saveUserToFirestore(firebaseUser);
       } else {
         setUser(null);
         await AsyncStorage.removeItem('userId');

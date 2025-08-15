@@ -1,4 +1,3 @@
-// /src/utils/transactionUtils.js
 import {
   collection,
   doc,
@@ -11,7 +10,7 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore';
-import { db } from '../firebase/firebase';
+import { db } from '../firebaseConfig';
 
 //  Add Transaction to Wallet
 export const addTransaction = async (uid, walletId, txnData) => {

@@ -44,3 +44,10 @@ export const deleteWallet = async (uid, walletId) => {
   await deleteDoc(walletRef);
 };
 
+
+export const getFirstWalletId = async (uid) => {
+  const walletRef = collection(db, 'users', uid, 'wallets');
+  const snapshot = await getDocs(walletRef);
+  return snapshot.docs.length > 0 ? snapshot.docs[0].id : null;
+};
+

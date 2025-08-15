@@ -4,14 +4,38 @@ import {hp,wp} from '../../utils/Common'
 import Icon from "react-native-vector-icons/Feather";
 import { useNavigation } from '@react-navigation/native';
 import { getAuth,onAuthStateChanged } from 'firebase/auth';
-
+import { getTransactions } from '../../utils/TransactionUtils';
+import { getFirstWalletId } from '../../utils/WalletUtils';
 const HomeScreen = () => {
   const [username,setUsername] = useState('');
   const auth = getAuth();
   const navigation = useNavigation();
+  const [transactions,setTransactiondata] = useState([]);
+  const [walletId,SetWalletid] = useState([])
   const handleClick = () => {
       navigation.navigate('NewTransaction')
     }
+
+
+    const uid = getAuth().currentUser?.uid;
+    useEffect(() => {
+  const fetchData = async () => {
+    if (!uid) return;
+
+    const walletId = await getFirstWalletId(uid);
+    if (!walletId) {
+      console.log("No wallets found");
+      return;
+    }
+
+    const data = await getTransactions(uid, walletId);
+    console.log("Fetched transactions:", data);
+    setTransactiondata(data);
+  };
+
+  fetchData();
+}, [uid]);
+
 
   useEffect (()=>{
     const unsubscribe = onAuthStateChanged(auth,(user) =>{
@@ -22,6 +46,8 @@ const HomeScreen = () => {
     })
     return unsubscribe;
   },[])
+
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.nameContainer}>
@@ -54,8 +80,43 @@ const HomeScreen = () => {
         <TouchableOpacity style={styles.addButton} onPress={handleClick}>
                 <Icon name="plus" size={18} color="#000" />
               </TouchableOpacity>
-        </View>      
-        <FlatList></FlatList>
+        </View>  
+         <View style={{ padding: 16, marginTop: hp(2),color:'#ff'
+       }}>
+        <FlatList
+          data={transactions}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                padding: 20,
+                marginVertical: 2,
+                backgroundColor: '#2b3c2bff',
+                borderRadius: 20,
+                width: wp(90),
+                color:'#8b95a5ff'
+              }}
+            >
+            
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                {item.Category}
+              </Text>
+              <Text style={{ fontSize: 16 }}>₹{item.Amount}</Text>
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                {item.typename}
+              </Text>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+  {item.createdAt.toDate().toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })}
+</Text>
+              
+            </View>
+          )}
+        />
+      </View>  
       
     </SafeAreaView>
   )
