@@ -30,14 +30,18 @@ const WalletScreen = () => {
       const data = await getWallets(uid);
       SetWalletdata(data);
 
-      // const total = data.reduce((sum,wallet) => sum+wallet.balance,0);
+      
       const total = data.reduce((sum, wallet) => {
-  return sum + Number(wallet.balance || 0);
+        const balance = parseFloat(wallet.balance)
+        return sum + Number(isNaN(balance) ? 0 : balance);
 }, 0);
       Settotalbalance(total)
+      console.log(total)
     };
     fetchData();
   }, [uid]);
+
+
   return (
     <View style={styles.container}>
       <View style={styles.balance}>
