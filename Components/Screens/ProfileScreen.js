@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import React, { useState,useEffect } from "react";
 import { hp, wp } from "../../utils/Common";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import { MaterialIcons } from "@expo/vector-icons";
+
 import { useNavigation } from '@react-navigation/native'
 import { signOut } from "firebase/auth";
 import {auth} from '../../firebaseConfig'
@@ -32,10 +33,10 @@ const ProfileScreen = () => {
     },[])
   const navigation = useNavigation();
   const menuItems = [
-    { label: "Edit Profile", icon: "person", bgColor: "#5A65EA",onPress: () => navigation.navigate("EditProfile") },
-    { label: "Settings", icon: "settings", bgColor: "#3B945E" },
-    { label: "Privacy Policy", icon: "lock", bgColor: "#555555" },
-    { label: "Logout", icon: "power-settings-new", bgColor: "#D24545" , onPress:()=>{handleLogout()}},
+  { label: "Edit Profile", icon: "person", bgColor: "#5A65EA", onPress: () => navigation.navigate("EditProfile") },
+  { label: "Settings", icon: "settings", bgColor: "#3B945E" },
+  { label: "Privacy Policy", icon: "lock", bgColor: "#555555" },
+  { label: "Logout", icon: "power-settings-new", bgColor: "#D24545", onPress: handleLogout },
   ];
   return (
     <View style={styles.container}>
@@ -53,18 +54,16 @@ const ProfileScreen = () => {
         {menuItems.map((item, index) => (
           <TouchableOpacity key={index} style={styles.menuItem} onPress={item.onPress}
 >
-            <View
-              style={[styles.iconContainer, { backgroundColor: item.bgColor }]}
-            >
-              <Icon name={item.icon} size={20} color="#fff" />
-            </View>
+           <View style={[styles.iconContainer, { backgroundColor: item.bgColor }]}>
+  <MaterialIcons name={item.icon} size={20} color="#fff" />
+</View>
             <Text style={styles.label}>{item.label}</Text>
-            <Icon
-              name="chevron-right"
-              size={24}
-              color="#aaa"
-              style={{ marginLeft: "auto" }}
-            />
+            <MaterialIcons
+  name="chevron-right"
+  size={24}
+  color="#aaa"
+  style={{ marginLeft: "auto" }}
+/>
           </TouchableOpacity>
         ))}
       </View>

@@ -1,15 +1,16 @@
-import { View, Text,Button,StyleSheet,SafeAreaView,Image,TouchableOpacity} from 'react-native'
+import { View, Text,Button,StyleSheet,Image,TouchableOpacity} from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
 import {hp,wp} from "../../utils/Common"
+import { SafeAreaView } from 'react-native-safe-area-context';
 const OnBoardScreen = () => {
     const navigation = useNavigation();
     const onPress= ()=> navigation.navigate('Login')
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.Headtext}>Welcome To WalletWhiz</Text>
+      <Text style={styles.Headtext}>Welcome To Wallet Whiz</Text>
       <Image style = {styles.onboardimage} source={require('../../assets/Onboardimage.jpg')}/>
-      <Text style={styles.DownText}>“Know Where Your Money Goes.”</Text>
+      <Text style={styles.DownText}></Text>
       <TouchableOpacity onPress={onPress} style={styles.button}>
         <Text style={styles.buttontext}>Get Started</Text>
       </TouchableOpacity>

@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { wp, hp } from "../../utils/Common";
-import Icon from "react-native-vector-icons/Feather";
+import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { getWallets } from "../../utils/WalletUtils";
 import { db } from "../../firebaseConfig";
@@ -52,8 +52,8 @@ const WalletScreen = () => {
       <View style={styles.Walletcontainer}>
         <Text style={styles.walletText}>My Wallets</Text>
         <TouchableOpacity style={styles.addButton} onPress={handleClick}>
-          <Icon name="plus" size={18} color="#000" />
-        </TouchableOpacity>
+        <Feather name="plus" size={18} color="#000" />
+      </TouchableOpacity>
       </View>
       <View style={{ padding: 16, marginTop: hp(2),color:'#ff'
        }}>
