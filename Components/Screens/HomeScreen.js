@@ -5,6 +5,7 @@ import {
   FlatList,
   
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { hp, wp } from "../../utils/Common";
@@ -20,6 +21,11 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [transactions, setTransactiondata] = useState([]);
   const [walletId, SetWalletid] = useState([]);
+  const [totalBalance,SetTotalBalance] = useState(0);
+  const [income,SetIncome] = useState(0);
+  const [expense,SetExpense] = useState(0);
+  
+  
   const handleClick = () => {
     navigation.navigate("NewTransaction");
   };
@@ -65,18 +71,18 @@ const HomeScreen = () => {
           <Text style={styles.balanceLabel}>Total Balance</Text>
         </View>
 
-        <Text style={styles.balanceAmount}> ₹504.00</Text>
+        <Text style={styles.balanceAmount}>₹{totalBalance}</Text>
         <View style={styles.incomeExpenseRow}>
           <View style={styles.incomeBox}>
             <Text style={styles.incomeArrow}>↓</Text>
             <Text style={styles.incomeLabel}>Income</Text>
-            <Text style={styles.incomeAmount}>₹2429.00</Text>
+            <Text style={styles.incomeAmount}>₹{income}</Text>
           </View>
 
           <View style={styles.expenseBox}>
             <Text style={styles.expenseArrow}>↑</Text>
             <Text style={styles.expenseLabel}>Expense</Text>
-            <Text style={styles.expenseAmount}>₹1925.00</Text>
+            <Text style={styles.expenseAmount}>₹{expense}</Text>
           </View>
         </View>
       </View>
@@ -86,15 +92,15 @@ const HomeScreen = () => {
   <Feather name="plus" size={18} color="#000" />
 </TouchableOpacity>
       </View>
-      <View style={{ padding: 16, marginTop: hp(2), color: "#ff" }}>
+      {/* <ScrollView style={{ padding: 16, marginTop: hp(2), color: "#ff" }}> */}
         <FlatList
           data={transactions}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View
               style={{
-                padding: 20,
-                marginVertical: 2,
+                padding: 10,
+                marginVertical: 4,
                 backgroundColor: "#2b3c2bff",
                 borderRadius: 20,
                 width: wp(90),
@@ -118,7 +124,7 @@ const HomeScreen = () => {
             </View>
           )}
         />
-      </View>
+      {/* </ScrollView> */}
     </SafeAreaView>
   );
 };
@@ -131,7 +137,7 @@ const styles = StyleSheet.create({
     // justifyContent:'center'
   },
   nameContainer: {
-    marginTop: hp(5),
+    // marginTop: hp(5),
     marginLeft: wp(-50),
     // alignItems:'flex-start',
   },
