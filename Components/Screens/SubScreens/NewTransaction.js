@@ -124,7 +124,7 @@ const NewTransaction = () => {
       />
 
       {/* ADDD SECTION FOR THE SELECTING WALLETS */}
-      <Text style={styles.label}>Wallet</Text>
+      {/* <Text style={styles.label}>Wallet</Text>
 
       <TouchableOpacity
         style={styles.selector}
@@ -135,7 +135,7 @@ const NewTransaction = () => {
         </Text>
       </TouchableOpacity>
 
-      {renderWalletDropdown()}
+      {renderWalletDropdown()} */}
 
 
   {/* SECTION FOR DATE AND TIME */}

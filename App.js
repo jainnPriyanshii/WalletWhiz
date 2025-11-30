@@ -12,6 +12,7 @@ import { getWallets } from "./utils/WalletUtils";
 import SelectWalletScreen from "./Components/Screens/SelectWalletScreen";
 import WalletScreen from "./Components/Screens/WalletScreen";
 import AddWallet from "./Components/Screens/SubScreens/AddWallet";
+import SelectedWalletContext, { SelectedWalletProvider, SelectedWalletprovider } from "./Context/SelectedWalletContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -110,6 +111,7 @@ export default function App() {
   // );
   return (
   <AuthProvider>
+    <SelectedWalletProvider>
     <NavigationContainer>
       {initialRoute === "Onboard" && (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -133,6 +135,7 @@ export default function App() {
         </Stack.Navigator>
       )}
     </NavigationContainer>
+   </SelectedWalletProvider>
   </AuthProvider>
 );
 }

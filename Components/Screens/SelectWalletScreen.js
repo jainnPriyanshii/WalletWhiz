@@ -1,17 +1,22 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { wp, hp } from "../../utils/Common";
 import { getWallets } from "../../utils/WalletUtils";
 import { getAuth } from "firebase/auth";
 import { Feather } from "@expo/vector-icons";
+import SelectedWalletContext from '../../Context/SelectedWalletContext'
+import { useNavigation } from "@react-navigation/native";
 
 const SelectWalletScreen = () => {
   const [walletData, setWalletData] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState(null);
 
+  const {SetSelectedWalletname }= useContext(SelectedWalletContext);
+
   const uid = getAuth().currentUser?.uid;
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,6 +27,11 @@ const SelectWalletScreen = () => {
     fetchData();
   }, [uid]);
 
+
+  function onWalletpress(wallet)  {
+    SetSelectedWalletname(wallet.name)
+    navigation.navigate('WalletWhizHome');
+  }
   const renderWalletDropdown = () => {
     if (!isDropdownVisible) return null;
 
@@ -33,7 +43,8 @@ const SelectWalletScreen = () => {
               key={wallet.id}
               style={styles.walletItem}
               onPress={() => {
-                setSelectedWallet(wallet);
+                // setSelectedWallet(wallet);
+                onWalletpress(wallet);
                 setIsDropdownVisible(false);
               }}
             >
