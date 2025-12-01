@@ -3,20 +3,20 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   KeyboardAvoidingView,
   ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { hp, wp } from "../../../utils/Common";
 import { getWallets } from "../../../utils/WalletUtils";
 import { getAuth } from "firebase/auth";
 import { addTransaction } from "../../../utils/TransactionUtils";
 import { useNavigation } from "@react-navigation/native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
+import SelectedWalletContext from "../../../Context/SelectedWalletContext";
 const NewTransaction = () => {
   const [type, setType] = useState("Expense");
   const [amount, setAmount] = useState("");
@@ -24,12 +24,12 @@ const NewTransaction = () => {
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [description, setDescription] = useState("");
-  const [walletData, setWalletData] = useState([]);
+  // const [walletData, setWalletData] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState(null);
+  // const [selectedWallet, setSelectedWallet] = useState(null);
  const navigation = useNavigation();
   const uid = getAuth().currentUser?.uid;
-
+  const {walletname} = useContext(SelectedWalletContext);
   useEffect(() => {
     const fetchData = async () => {
       if (!uid) return;
@@ -64,7 +64,7 @@ const NewTransaction = () => {
   // ADDING THE NEW TRANSACTION
   const newTransaction = async () => {
       try {
-        if (!selectedWallet?.id) {
+        if (!walletname) {
       console.warn("No wallet selected");
       return;
         }
@@ -73,12 +73,12 @@ const NewTransaction = () => {
           typename: type,
           Amount: amount,
           Category: category,
-          wallet: selectedWallet,
+          // wallet: selectedWallet,
           Datetransaction :date,
           Description:description,
         };
   
-        await addTransaction(uid, selectedWallet.id, TransactionData);
+        await addTransaction(uid, walletname, TransactionData);
         navigation.navigate("Home");
         console.log("Navigated")
       } catch (err) {

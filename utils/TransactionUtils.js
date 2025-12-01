@@ -13,9 +13,9 @@ import {
 import { db } from '../firebaseConfig';
 
 //  Add Transaction to Wallet
-export const addTransaction = async (uid, walletId, txnData) => {
+export const addTransaction = async (uid, walletname, txnData) => {
   const txnRef = await addDoc(
-    collection(db, 'users', uid, 'wallets', walletId, 'transactions'),
+    collection(db, 'users', uid, 'wallets', walletname, 'transactions'),
     {
       ...txnData,
       createdAt: serverTimestamp(),

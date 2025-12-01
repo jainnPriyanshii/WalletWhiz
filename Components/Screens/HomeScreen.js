@@ -22,7 +22,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [transactions, setTransactiondata] = useState([]);
   const [walletId, SetWalletid] = useState([]);
-  const [totalBalance,SetTotalBalance] = useState(0);
+  const [totalBalance,SetTotalBalance] = useState(Amount);
   const [income,SetIncome] = useState(0);
   const [expense,SetExpense] = useState(0);
   
@@ -47,6 +47,7 @@ const HomeScreen = () => {
       console.log("walletname", walletname);
       console.log("Fetched transactions:", data);
       setTransactiondata(data);
+      
       }
     };
 
@@ -62,6 +63,26 @@ const HomeScreen = () => {
     });
     return unsubscribe;
   }, []);
+
+  // useEffect(()=>{
+  //   const fetchData = async () => {
+  //     if (!uid) return;
+
+  //     if(!walletname){
+  //       return null;
+      
+  //     }
+  //     else{
+  //     const data = await getTransactions(uid, walletname);
+  //     console.log("walletname", walletname);
+  //     console.log("Fetched transactions:", data);
+  //     totalBalance = income+expense;
+  //     SetTotalBalance(totalBalance)
+  //     }
+  //   };
+
+  //   fetchData();
+  // },[walletname])
 
   return (
     <SafeAreaView style={styles.container}>
