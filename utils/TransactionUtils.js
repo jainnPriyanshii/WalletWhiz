@@ -25,8 +25,8 @@ export const addTransaction = async (uid, walletId, txnData) => {
 };
 
 //  Get All Transactions (sorted by latest)
-export const getTransactions = async (uid, walletId) => {
-  const txnRef = collection(db, 'users', uid, 'wallets', walletId, 'transactions');
+export const getTransactions = async (uid, walletname) => {
+  const txnRef = collection(db, 'users', uid, 'wallets', walletname, 'transactions');
   const q = query(txnRef, orderBy('createdAt', 'desc'));
 
   const snapshot = await getDocs(q);

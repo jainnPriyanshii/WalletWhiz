@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { hp, wp } from "../../utils/Common";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -15,6 +15,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getTransactions } from "../../utils/TransactionUtils";
 import { getFirstWalletId } from "../../utils/WalletUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import SelectedWalletContext from "../../Context/SelectedWalletContext";
 const HomeScreen = () => {
   const [username, setUsername] = useState("");
   const auth = getAuth();
@@ -31,24 +32,26 @@ const HomeScreen = () => {
   };
 
   const uid = getAuth().currentUser?.uid;
+  const {walletname} = useContext(SelectedWalletContext);
   useEffect(() => {
     const fetchData = async () => {
       if (!uid) return;
 
-      const walletId = await getFirstWalletId(uid);
-      if (!walletId) {
-        console.log("No wallets found");
-        return;
+      
+      if(!walletname){
+        return null;
+      
       }
-
-      const data = await getTransactions(uid, walletId);
-      console.log("walletid", walletId);
+      else{
+        const data = await getTransactions(uid, walletname);
+      console.log("walletname", walletname);
       console.log("Fetched transactions:", data);
       setTransactiondata(data);
+      }
     };
 
     fetchData();
-  }, [uid]);
+  }, [walletname]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

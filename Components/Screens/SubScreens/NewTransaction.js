@@ -40,26 +40,26 @@ const NewTransaction = () => {
   }, [uid]);
 
   // CONDITIONAL RENDERING OF THE WALLET NAMES
-  const renderWalletDropdown = () => {
-    if (!isDropdownVisible) return null;
+  // const renderWalletDropdown = () => {
+  //   if (!isDropdownVisible) return null;
 
-    return (
-      <View style={styles.dropdown}>
-        {walletData.map((wallet) => (
-          <TouchableOpacity
-            key={wallet.id}
-            style={styles.walletItem}
-            onPress={() => {
-              setSelectedWallet(wallet);
-              setIsDropdownVisible(false);
-            }}
-          >
-            <Text>{wallet.name}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    );
-  };
+  //   return (
+  //     <View style={styles.dropdown}>
+  //       {walletData.map((wallet) => (
+  //         <TouchableOpacity
+  //           key={wallet.id}
+  //           style={styles.walletItem}
+  //           onPress={() => {
+  //             setSelectedWallet(wallet);
+  //             setIsDropdownVisible(false);
+  //           }}
+  //         >
+  //           <Text>{wallet.name}</Text>
+  //         </TouchableOpacity>
+  //       ))}
+  //     </View>
+  //   );
+  // };
 
   // ADDING THE NEW TRANSACTION
   const newTransaction = async () => {
