@@ -3,7 +3,6 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  
   TouchableOpacity,
   ScrollView,
 } from "react-native";
@@ -13,41 +12,67 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getTransactions } from "../../utils/TransactionUtils";
-import { getFirstWalletId } from "../../utils/WalletUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
-import SelectedWalletContext from "../../Context/SelectedWalletContext";
+import {SelectedWalletContext} from "../../Context/SelectedWalletContext";
+import { getWalletById, getWallets } from "../../utils/WalletUtils";
+
 const HomeScreen = () => {
+ 
   const [username, setUsername] = useState("");
   const auth = getAuth();
   const navigation = useNavigation();
   const [transactions, setTransactiondata] = useState([]);
   const [walletId, SetWalletid] = useState([]);
-  const [totalBalance,SetTotalBalance] = useState(Amount);
-  const [income,SetIncome] = useState(0);
-  const [expense,SetExpense] = useState(0);
-  
-  
+  const [totalBalance, SetTotalBalance] = useState(0);
+  const [income, SetIncome] = useState(0);
+  const [expense, SetExpense] = useState(0);
+  const [walletData, setWalletData] = useState(null);
+
   const handleClick = () => {
     navigation.navigate("NewTransaction");
   };
 
   const uid = getAuth().currentUser?.uid;
-  const {walletname} = useContext(SelectedWalletContext);
+  const  {walletname} = useContext(SelectedWalletContext);
+ console.log("CTX VALUE:", walletname);
+  
+
+    
   useEffect(() => {
     const fetchData = async () => {
       if (!uid) return;
 
-      
-      if(!walletname){
+      if (!walletname?.id) {
         return null;
-      
+      } else {
+        const data = await getTransactions(uid, walletname.id);
+        
+
+        console.log("walletname", walletname);
+        console.log("Fetched transactions:", data);
+        setTransactiondata(data);
       }
-      else{
-        const data = await getTransactions(uid, walletname);
-      console.log("walletname", walletname);
-      console.log("Fetched transactions:", data);
-      setTransactiondata(data);
-      
+    };
+
+    fetchData();
+  }, [walletname]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!uid) return;
+
+      if (!walletname?.id) {
+        return null;
+
+        
+      } else {
+        const data = await getWalletById(uid,walletname.id);
+        console.log("walletname", walletname);
+        console.log("walletdata", data);
+        setWalletData(data);
+        SetTotalBalance(data.currentBalance);
+        SetIncome(data.totalIncome);
+        SetExpense(data.totalExpense);
       }
     };
 
@@ -63,26 +88,6 @@ const HomeScreen = () => {
     });
     return unsubscribe;
   }, []);
-
-  // useEffect(()=>{
-  //   const fetchData = async () => {
-  //     if (!uid) return;
-
-  //     if(!walletname){
-  //       return null;
-      
-  //     }
-  //     else{
-  //     const data = await getTransactions(uid, walletname);
-  //     console.log("walletname", walletname);
-  //     console.log("Fetched transactions:", data);
-  //     totalBalance = income+expense;
-  //     SetTotalBalance(totalBalance)
-  //     }
-  //   };
-
-  //   fetchData();
-  // },[walletname])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -112,42 +117,42 @@ const HomeScreen = () => {
       </View>
       <View style={styles.transactionContainer}>
         <Text style={styles.transactionText}>Recent Transactions</Text>
-       <TouchableOpacity style={styles.addButton} onPress={handleClick}>
-  <Feather name="plus" size={18} color="#000" />
-</TouchableOpacity>
+        <TouchableOpacity style={styles.addButton} onPress={handleClick}>
+          <Feather name="plus" size={18} color="#000" />
+        </TouchableOpacity>
       </View>
       {/* <ScrollView style={{ padding: 16, marginTop: hp(2), color: "#ff" }}> */}
-        <FlatList
-          data={transactions}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                padding: 10,
-                marginVertical: 4,
-                backgroundColor: "#2b3c2bff",
-                borderRadius: 20,
-                width: wp(90),
-                color: "#8b95a5ff",
-              }}
-            >
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.Category}
-              </Text>
-              <Text style={{ fontSize: 16 }}>₹{item.Amount}</Text>
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.typename}
-              </Text>
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.createdAt.toDate().toLocaleDateString("en-IN", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </Text>
-            </View>
-          )}
-        />
+      <FlatList
+        data={transactions}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View
+            style={{
+              padding: 10,
+              marginVertical: 4,
+              backgroundColor: "#2b3c2bff",
+              borderRadius: 20,
+              width: wp(90),
+              color: "#8b95a5ff",
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+              {item.Category}
+            </Text>
+            <Text style={{ fontSize: 16 }}>₹{item.Amount}</Text>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+              {item.typename}
+            </Text>
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+              {item.createdAt.toDate().toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </Text>
+          </View>
+        )}
+      />
       {/* </ScrollView> */}
     </SafeAreaView>
   );

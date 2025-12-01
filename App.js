@@ -12,7 +12,7 @@ import { getWallets } from "./utils/WalletUtils";
 import SelectWalletScreen from "./Components/Screens/SelectWalletScreen";
 import WalletScreen from "./Components/Screens/WalletScreen";
 import AddWallet from "./Components/Screens/SubScreens/AddWallet";
-import SelectedWalletContext, { SelectedWalletProvider, SelectedWalletprovider } from "./Context/SelectedWalletContext";
+import {SelectedWalletContext, SelectedWalletProvider} from "./Context/SelectedWalletContext";
 
 const Stack = createNativeStackNavigator();
 

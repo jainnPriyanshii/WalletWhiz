@@ -13,9 +13,9 @@ import {
 import { db } from '../firebaseConfig';
 
 //  Add Transaction to Wallet
-export const addTransaction = async (uid, walletname, txnData) => {
+export const addTransaction = async (uid, walletId, txnData) => {
   const txnRef = await addDoc(
-    collection(db, 'users', uid, 'wallets', walletname, 'transactions'),
+    collection(db, 'users', uid, 'wallets', walletId, 'transactions'),
     {
       ...txnData,
       createdAt: serverTimestamp(),
@@ -25,8 +25,8 @@ export const addTransaction = async (uid, walletname, txnData) => {
 };
 
 //  Get All Transactions (sorted by latest)
-export const getTransactions = async (uid, walletname) => {
-  const txnRef = collection(db, 'users', uid, 'wallets', walletname, 'transactions');
+export const getTransactions = async (uid, walletId) => {
+  const txnRef = collection(db, 'users', uid, 'wallets', walletId, 'transactions');
   const q = query(txnRef, orderBy('createdAt', 'desc'));
 
   const snapshot = await getDocs(q);

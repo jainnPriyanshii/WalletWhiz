@@ -15,8 +15,8 @@ export const createWallet = async (uid, walletData) => {
   const walletRef = await addDoc(collection(db, 'users', uid, 'wallets'), {
 
     ...walletData,
-   initialBalance: walletData.amount,
-   currentBalance: walletData.amount,
+   initialBalance: walletData.balance,
+   currentBalance: walletData.balance,
    totalIncome: 0,
    totalExpense: 0,
     createdAt: serverTimestamp(),

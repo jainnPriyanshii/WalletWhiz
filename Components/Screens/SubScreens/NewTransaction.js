@@ -11,12 +11,13 @@ import { Picker } from "@react-native-picker/picker";
 import React, { useState, useEffect, useContext } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { hp, wp } from "../../../utils/Common";
-import { getWallets } from "../../../utils/WalletUtils";
+import { getWallets ,getWalletById,updateWallet} from "../../../utils/WalletUtils";
 import { getAuth } from "firebase/auth";
 import { addTransaction } from "../../../utils/TransactionUtils";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import SelectedWalletContext from "../../../Context/SelectedWalletContext";
+import { SelectedWalletContext } from "../../../Context/SelectedWalletContext";
+
 const NewTransaction = () => {
   const [type, setType] = useState("Expense");
   const [amount, setAmount] = useState("");
@@ -27,9 +28,11 @@ const NewTransaction = () => {
   // const [walletData, setWalletData] = useState([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   // const [selectedWallet, setSelectedWallet] = useState(null);
- const navigation = useNavigation();
+  const navigation = useNavigation();
   const uid = getAuth().currentUser?.uid;
-  const {walletname} = useContext(SelectedWalletContext);
+  const { walletname } = useContext(SelectedWalletContext);
+  console.log("CTX WALLET IN NEW TXN:", walletname);
+  console.log("CTX WALLET ID:", walletname?.id);
   useEffect(() => {
     const fetchData = async () => {
       if (!uid) return;
@@ -62,29 +65,103 @@ const NewTransaction = () => {
   // };
 
   // ADDING THE NEW TRANSACTION
+  // const newTransaction = async () => {
+  //   try {
+  //     const wallet = await getWallets(uid, walletname.id);
+  //     let currentBalance = Number(wallet.currentBalance);
+  //     let totalIncome = Number(wallet.totalIncome);
+  //     let totalExpense = Number(wallet.totalExpense);
+
+  //     if (!walletname.id) {
+  //       console.warn("No wallet selected");
+  //       return;
+  //     }
+
+  //     const TransactionData = {
+  //       typename: type,
+  //       Amount: amount,
+  //       Category: category,
+  //       // wallet: selectedWallet,
+  //       Datetransaction: date,
+  //       Description: description,
+  //     };
+  //     if (typename == "Expense" && amount <= totalbalance) {
+  //       totalExpense += amount;
+
+  //       currentBalance -= amount;
+  //     } else {
+  //       totalIncome += amount;
+  //       balance += amount;
+  //       currentBalance += amount;
+  //     }
+  //     await updateWallet(uid, walletname.id, {
+  //       currentBalance,
+  //       totalIncome,
+  //       totalExpense,
+  //     });
+  //     await addTransaction(uid, walletname.id, TransactionData);
+  //     navigation.navigate("Home");
+  //     console.log("Navigated");
+  //   } catch (err) {
+  //     console.error("Error adding transaction:", err);
+  //   }
+  // };
   const newTransaction = async () => {
-      try {
-        if (!walletname) {
+  try {
+    if (!walletname?.id) {
       console.warn("No wallet selected");
       return;
-        }
+    }
 
-        const TransactionData = {
-          typename: type,
-          Amount: amount,
-          Category: category,
-          // wallet: selectedWallet,
-          Datetransaction :date,
-          Description:description,
-        };
+    const wallet = await getWalletById(uid, walletname.id);
+
+    let currentBalance = Number(wallet.currentBalance);
+    let totalIncome    = Number(wallet.totalIncome);
+    let totalExpense   = Number(wallet.totalExpense);
+    let txnAmount      = Number(amount);
+
   
-        await addTransaction(uid, walletname, TransactionData);
-        navigation.navigate("Home");
-        console.log("Navigated")
-      } catch (err) {
-        console.error("Error adding transaction:", err);
+    if (type === "Expense") {
+      if (txnAmount > currentBalance) {
+        alert("Not enough balance!");
+        return;
       }
+
+      currentBalance -= txnAmount;
+      totalExpense   += txnAmount;
+    } else {
+     
+      currentBalance += txnAmount;
+      totalIncome    += txnAmount;
+    }
+
+  
+    const TransactionData = {
+      typename: type,
+      Amount: txnAmount,
+      Category: category,
+      Datetransaction: date,
+      Description: description,
     };
+
+ 
+    await updateWallet(uid, walletname.id, {
+      currentBalance,
+      totalIncome,
+      totalExpense,
+    });
+    
+
+    await addTransaction(uid, walletname.id, TransactionData);
+
+    navigation.navigate("Home");
+    console.log("Transaction added and wallet updated ✔️");
+
+  } catch (err) {
+    console.error("Error adding transaction:", err);
+  }
+};
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,7 +179,6 @@ const NewTransaction = () => {
           <Picker.Item label="Income" value="Income" />
         </Picker>
       </View>
-
 
       {/* AMOUNT SECTION */}
       <Text style={styles.label}>Amount</Text>
@@ -137,8 +213,7 @@ const NewTransaction = () => {
 
       {renderWalletDropdown()} */}
 
-
-  {/* SECTION FOR DATE AND TIME */}
+      {/* SECTION FOR DATE AND TIME */}
       <Text style={styles.label}>Date</Text>
       <TouchableOpacity
         style={styles.selector}
@@ -167,7 +242,9 @@ const NewTransaction = () => {
         onChangeText={setDescription}
       />
       <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText} onPress={newTransaction}>Add</Text>
+        <Text style={styles.addButtonText} onPress={newTransaction}>
+          Add
+        </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

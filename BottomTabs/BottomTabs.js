@@ -1,3 +1,4 @@
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Feather, Octicons } from "@expo/vector-icons";
 import HomeScreen from "../../WalletWhiz/Components/Screens/HomeScreen";
@@ -8,6 +9,7 @@ import NewTransaction from "../../WalletWhiz/Components/Screens/SubScreens/NewTr
 import AddWallet from "../../WalletWhiz/Components/Screens/SubScreens/AddWallet";
 import EditProfile from "../../WalletWhiz/Components/Screens/SubScreens/EditProfile";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {SelectedWalletContext} from "../Context/SelectedWalletContext";
 
 
 
@@ -50,7 +52,11 @@ const Tab = createBottomTabNavigator();
 
 // const MyTabs = () => {
   function MyTabs () {
+    
+    const { walletname } = React.useContext(SelectedWalletContext);
+
   return (
+    
     <Tab.Navigator screenOptions={{tabBarActiveTintColor:'#87C184',tabBarStyle:{
       backgroundColor:'#192019'
     }

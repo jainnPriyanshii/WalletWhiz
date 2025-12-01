@@ -5,8 +5,8 @@ export const SelectedWalletContext = createContext();
 export const SelectedWalletProvider = ({ children }) => {
   const [walletname, SetWalletname] = useState(null);
 
-  function SetSelectedWalletname(name) {
-    SetWalletname(name);
+  function SetSelectedWalletname(wallet) {
+    SetWalletname(wallet);
   }
 
   return (

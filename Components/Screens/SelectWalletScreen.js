@@ -5,7 +5,7 @@ import { wp, hp } from "../../utils/Common";
 import { getWallets } from "../../utils/WalletUtils";
 import { getAuth } from "firebase/auth";
 import { Feather } from "@expo/vector-icons";
-import SelectedWalletContext from '../../Context/SelectedWalletContext'
+import {SelectedWalletContext} from '../../Context/SelectedWalletContext'
 import { useNavigation } from "@react-navigation/native";
 
 const SelectWalletScreen = () => {
@@ -13,7 +13,7 @@ const SelectWalletScreen = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState(null);
 
-  const {SetSelectedWalletname }= useContext(SelectedWalletContext);
+  const {SetSelectedWalletname}= useContext(SelectedWalletContext);
 
   const uid = getAuth().currentUser?.uid;
   const navigation = useNavigation();
@@ -29,7 +29,7 @@ const SelectWalletScreen = () => {
 
 
   function onWalletpress(wallet)  {
-    SetSelectedWalletname(wallet.name)
+    SetSelectedWalletname(wallet)
     navigation.navigate('WalletWhizHome');
   }
   const renderWalletDropdown = () => {
