@@ -1,21 +1,17 @@
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
-import {hp,wp} from '../../utils/Common'
-import { useState } from "react";
+import React, { useState } from "react";
+import { hp, wp } from "../../utils/Common";
 import { useNavigation } from "@react-navigation/native";
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
-
-
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebaseConfig";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -23,15 +19,10 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
-
-
- const handlelogin = (email, password) => {
-  console.log("user login")
-  return signInWithEmailAndPassword(auth, email, password);
-  
-};
-
-
+  const handlelogin = (email, password) => {
+    console.log("user login");
+    return signInWithEmailAndPassword(auth, email, password);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -39,110 +30,145 @@ const LoginScreen = () => {
       behavior="padding"
       keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
     >
-      <Text style={styles.Headtext}>Login now to track your all expenses</Text>
-      <View style={styles.form}>
+      <Text style={styles.Headtext}>Login to track your expenses</Text>
+
+      {/* FORM CARD */}
+      <View style={styles.card}>
         <Text style={styles.label}>Email</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter email"
+          placeholderTextColor="#777"
           value={email}
           onChangeText={setEmail}
         />
-        {errors.email ? (
-          <Text style={styles.errorText}>{errors.email}</Text>
-        ) : null}
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+
         <Text style={styles.label}>Password</Text>
         <TextInput
           style={styles.input}
-          placeholder="Password please"
+          placeholder="Enter password"
+          placeholderTextColor="#777"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
         />
-        {errors.password ? (
+        {errors.password && (
           <Text style={styles.errorText}>{errors.password}</Text>
-        ) : null}
-        <TouchableOpacity style = {styles.button}  onPress={() => handlelogin(email, password)}>
+        )}
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handlelogin(email, password)}
+        >
           <Text style={styles.buttontext}>Login</Text>
         </TouchableOpacity>
-        
       </View>
-       <Text style={{ textAlign: 'center', marginTop: hp(5) ,color:'#87C184'}}>
-      Don't have an account?{" "}
-      <Text
-        style={{ color: '#2AFBB7', textDecorationLine: 'underline' }}
-        onPress={() => navigation.navigate('Register')}
-      >
-        Create One
+
+      {/* FOOTER NAV */}
+      <Text style={styles.footerText}>
+        Don't have an account?{" "}
+        <Text
+          style={styles.link}
+          onPress={() => navigation.navigate("Register")}
+        >
+          Create One
+        </Text>
       </Text>
-    </Text>
     </KeyboardAvoidingView>
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#0E0E0E",
     justifyContent: "center",
-    backgroundColor: "#192019",
-    paddingHorizontal: wp(5),
+    paddingHorizontal: wp(6),
   },
- Headtext:{
-    fontSize:18,
-    color:'#87C184',
-    fontWeight:'bold',
-    marginBottom:hp(5),
-   textAlign:'center'
+
+  Headtext: {
+    fontSize: 22,
+    color: "#A8F0B0",
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: hp(4),
+    letterSpacing: 0.4,
   },
-  form: {
-    backgroundColor: "#82B08C",
-    padding: wp(5),
-    borderRadius: wp(2.5),
-    shadowColor: "black",
-    shadowOffset: {
-      width: 0,
-      height: hp(0.25),
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: wp(1),
+
+  card: {
+    backgroundColor: "#161A16",
+    padding: wp(6),
+    borderRadius: 14,
+
     elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+
+    borderWidth: 1,
+    borderColor: "#1F281F",
   },
 
   label: {
-    fontSize: wp(4),
-    marginBottom: hp(0.5),
-    fontWeight: "bold",
+    fontSize: wp(3.8),
+    color: "#C8E5CE",
+    fontWeight: "600",
+    marginBottom: hp(0.8),
   },
 
   input: {
-    height: hp(5),
-    borderColor: "#ddd",
+    height: hp(5.5),
+    backgroundColor: "#1F241F",
+    borderColor: "#2B332B",
     borderWidth: 1,
-    marginBottom: hp(1.5),
-    padding: wp(2.5),
-    borderRadius: wp(1.5),
-  },
-  button:{
-    height:hp(5),
-    // width:wp(),
-    backgroundColor:'#415B48',
-    borderRadius:10,
-    marginTop:hp(0.5),
-    
+    borderRadius: 10,
+    color: "#E3FFE8",
+    paddingHorizontal: wp(3),
+    marginBottom: hp(2),
+    fontSize: 15,
   },
 
-  buttontext:{
- color:'#fff',
-  textAlign:'center',
-  paddingTop:hp(0.6),
-  fontWeight:'bold',
-  fontSize:18,
+  button: {
+    height: hp(6),
+    backgroundColor: "#2E4333",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+
+  buttontext: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
 
   errorText: {
-    color: "red",
+    color: "#FF6B6B",
     marginBottom: hp(1),
+    fontSize: 13,
+  },
+
+  footerText: {
+    textAlign: "center",
+    marginTop: hp(4),
+    color: "#87C184",
+    fontSize: 15,
+  },
+
+  link: {
+    color: "#34F5C5",
+    textDecorationLine: "underline",
+    fontWeight: "600",
   },
 });
+
 export default LoginScreen;

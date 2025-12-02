@@ -4,7 +4,6 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  ScrollView,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { hp, wp } from "../../utils/Common";
@@ -13,147 +12,127 @@ import { useNavigation } from "@react-navigation/native";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getTransactions } from "../../utils/TransactionUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {SelectedWalletContext} from "../../Context/SelectedWalletContext";
-import { getWalletById, getWallets } from "../../utils/WalletUtils";
+import { SelectedWalletContext } from "../../Context/SelectedWalletContext";
+import { getWalletById } from "../../utils/WalletUtils";
 
 const HomeScreen = () => {
- 
   const [username, setUsername] = useState("");
   const auth = getAuth();
   const navigation = useNavigation();
   const [transactions, setTransactiondata] = useState([]);
-  const [walletId, SetWalletid] = useState([]);
   const [totalBalance, SetTotalBalance] = useState(0);
   const [income, SetIncome] = useState(0);
   const [expense, SetExpense] = useState(0);
-  const [walletData, setWalletData] = useState(null);
+
+  const uid = getAuth().currentUser?.uid;
+  const { walletname } = useContext(SelectedWalletContext);
 
   const handleClick = () => {
     navigation.navigate("NewTransaction");
   };
 
-  const uid = getAuth().currentUser?.uid;
-  const  {walletname} = useContext(SelectedWalletContext);
- console.log("CTX VALUE:", walletname);
-  
-
-    
   useEffect(() => {
-    const fetchData = async () => {
-      if (!uid) return;
+    const fetchTransactions = async () => {
+      if (!uid || !walletname?.id) return;
 
-      if (!walletname?.id) {
-        return null;
-      } else {
-        const data = await getTransactions(uid, walletname.id);
-        
-
-        console.log("walletname", walletname);
-        console.log("Fetched transactions:", data);
-        setTransactiondata(data);
-      }
+      const data = await getTransactions(uid, walletname.id);
+      setTransactiondata(data);
     };
 
-    fetchData();
+    fetchTransactions();
   }, [walletname]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!uid) return;
+    const fetchWalletData = async () => {
+      if (!uid || !walletname?.id) return;
 
-      if (!walletname?.id) {
-        return null;
-
-        
-      } else {
-        const data = await getWalletById(uid,walletname.id);
-        console.log("walletname", walletname);
-        console.log("walletdata", data);
-        setWalletData(data);
-        SetTotalBalance(data.currentBalance);
-        SetIncome(data.totalIncome);
-        SetExpense(data.totalExpense);
-      }
+      const data = await getWalletById(uid, walletname.id);
+      SetTotalBalance(data.currentBalance);
+      SetIncome(data.totalIncome);
+      SetExpense(data.totalExpense);
     };
 
-    fetchData();
+    fetchWalletData();
   }, [walletname]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUsername(user.displayName);
-        console.log(user.displayName);
-      }
+      if (user) setUsername(user.displayName);
     });
     return unsubscribe;
   }, []);
 
+  const renderItem = ({ item }) => (
+    <View style={styles.transactionCard}>
+      <View style={styles.transactionRow}>
+        <Text style={styles.categoryText}>{item.Category}</Text>
+        <Text
+          style={[
+            styles.amountText,
+            { color: item.typename === "Income" ? "#6BFF8A" : "#FF6B6B" },
+          ]}
+        >
+          ₹{item.Amount}
+        </Text>
+      </View>
+
+      <View style={styles.transactionDetailRow}>
+        <Text style={styles.typeText}>{item.typename}</Text>
+
+        <Text style={styles.dateText}>
+          {item.createdAt.toDate().toLocaleDateString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+        </Text>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* HEADER */}
       <View style={styles.nameContainer}>
         <Text style={styles.helloText}>Hello,</Text>
         <Text style={styles.nameText}>{username}!</Text>
       </View>
-      <View style={styles.balanceContainer}>
-        <View style={styles.balanceHeader}>
-          <Text style={styles.balanceLabel}>Total Balance</Text>
-        </View>
 
+      {/* BALANCE CARD */}
+      <View style={styles.balanceCard}>
+        <Text style={styles.balanceLabel}>Total Balance</Text>
         <Text style={styles.balanceAmount}>₹{totalBalance}</Text>
+
         <View style={styles.incomeExpenseRow}>
-          <View style={styles.incomeBox}>
-            <Text style={styles.incomeArrow}>↓</Text>
+          <View style={styles.incomeExpenseBox}>
             <Text style={styles.incomeLabel}>Income</Text>
-            <Text style={styles.incomeAmount}>₹{income}</Text>
+            <Text style={styles.incomeValue}>₹{income}</Text>
           </View>
 
-          <View style={styles.expenseBox}>
-            <Text style={styles.expenseArrow}>↑</Text>
+          <View style={styles.incomeExpenseBox}>
             <Text style={styles.expenseLabel}>Expense</Text>
-            <Text style={styles.expenseAmount}>₹{expense}</Text>
+            <Text style={styles.expenseValue}>₹{expense}</Text>
           </View>
         </View>
       </View>
-      <View style={styles.transactionContainer}>
+
+      {/* TRANSACTIONS HEADER */}
+      <View style={styles.transactionHeader}>
         <Text style={styles.transactionText}>Recent Transactions</Text>
+
         <TouchableOpacity style={styles.addButton} onPress={handleClick}>
-          <Feather name="plus" size={18} color="#000" />
+          <Feather name="plus" size={18} color="#0E0E0E" />
         </TouchableOpacity>
       </View>
-      {/* <ScrollView style={{ padding: 16, marginTop: hp(2), color: "#ff" }}> */}
+
+      {/* TRANSACTION LIST */}
       <FlatList
         data={transactions}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              padding: 10,
-              marginVertical: 4,
-              backgroundColor: "#2b3c2bff",
-              borderRadius: 20,
-              width: wp(90),
-              color: "#8b95a5ff",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              {item.Category}
-            </Text>
-            <Text style={{ fontSize: 16 }}>₹{item.Amount}</Text>
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              {item.typename}
-            </Text>
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              {item.createdAt.toDate().toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
-            </Text>
-          </View>
-        )}
+        renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: hp(5) }}
       />
-      {/* </ScrollView> */}
     </SafeAreaView>
   );
 };
@@ -161,134 +140,165 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#192019",
+    backgroundColor: "#0E0E0E",
     alignItems: "center",
-    // justifyContent:'center'
+    paddingTop: hp(3),
   },
+
   nameContainer: {
-    // marginTop: hp(5),
-    marginLeft: wp(-50),
-    // alignItems:'flex-start',
+    width: wp(90),
+    marginBottom: hp(1),
   },
+
   helloText: {
-    color: "#e5e5e5",
+    color: "#A3A3A3",
     fontSize: 16,
-    textAlign: "left",
   },
 
   nameText: {
-    color: "#fff",
-    fontSize: 24,
-    textAlign: "left",
+    color: "#E7FFE9",
+    fontSize: 26,
+    fontWeight: "700",
+    letterSpacing: 0.4,
   },
 
-  balanceContainer: {
-    backgroundColor: "#e5e5e5",
-    height: hp(25),
+  balanceCard: {
+    backgroundColor: "#161A16",
     width: wp(90),
-    borderRadius: 25,
-    marginTop: hp(2),
-  },
+    borderRadius: 18,
+    paddingVertical: hp(2),
+    paddingHorizontal: wp(6),
 
-  balanceHeader: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 6,
+
+    marginBottom: hp(3),
   },
 
   balanceLabel: {
-    fontSize: 20,
+    color: "#C8E5CE",
+    fontSize: 16,
     fontWeight: "600",
-    color: "#333",
-    //  marginLeft:wp(5),
-    marginTop: hp(1),
+    textAlign: "center",
   },
 
   balanceAmount: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#000",
-    // marginVertical: 10,
-    marginLeft: wp(30),
+    color: "#E3FFE8",
+    fontSize: 34,
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: hp(1),
   },
 
   incomeExpenseRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
-    // marginLeft:wp(-10)
+    marginTop: hp(2),
   },
 
-  incomeBox: {
+  incomeExpenseBox: {
     alignItems: "center",
     flex: 1,
-  },
-
-  expenseBox: {
-    alignItems: "center",
-    flex: 1,
-  },
-
-  incomeArrow: {
-    color: "green",
-    fontSize: 16,
-  },
-
-  expenseArrow: {
-    color: "red",
-    fontSize: 16,
   },
 
   incomeLabel: {
-    color: "#333",
+    color: "#89FF8A",
     fontSize: 14,
-    marginTop: 4,
+    fontWeight: "600",
   },
 
   expenseLabel: {
-    color: "#333",
+    color: "#FF7F7F",
     fontSize: 14,
-    marginTop: 4,
+    fontWeight: "600",
   },
 
-  incomeAmount: {
-    color: "green",
-    fontWeight: "bold",
-    fontSize: 16,
-    marginTop: 2,
+  incomeValue: {
+    color: "#7EFF9C",
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: hp(0.5),
   },
 
-  expenseAmount: {
-    color: "red",
-    fontWeight: "bold",
-    fontSize: 16,
-    marginTop: 2,
+  expenseValue: {
+    color: "#FF6B6B",
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: hp(0.5),
   },
 
-  transactionContainer: {
-    // justifyContent:'space-between',
-    // alignItems:'center',
+  transactionHeader: {
     flexDirection: "row",
-    marginTop: hp(2),
-    // marginLeft:wp(0)
+    width: wp(90),
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: hp(1.5),
   },
+
   transactionText: {
+    color: "#C8E5CE",
     fontSize: 20,
-    color: "#edede9",
-    // marginTop:hp(2),
-    letterSpacing: wp(0.3),
-    fontWeight: "bold",
+    fontWeight: "700",
   },
+
   addButton: {
     backgroundColor: "#A5FF3F",
-    padding: 8,
-    borderRadius: 50,
-    alignItems: "center",
+    padding: 10,
+    borderRadius: 40,
     justifyContent: "center",
-    width: wp(10),
-    height: hp(5),
-    marginLeft: wp(16),
-    // marginTop:hp(2)
+    alignItems: "center",
+  },
+
+  transactionCard: {
+    backgroundColor: "#1A1F1A",
+    borderRadius: 14,
+    width: wp(90),
+    padding: wp(4),
+    marginVertical: hp(0.8),
+
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+
+    borderWidth: 1,
+    borderColor: "#232A23",
+  },
+
+  transactionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  categoryText: {
+    color: "#E3FFE8",
+    fontSize: 17,
+    fontWeight: "700",
+  },
+
+  amountText: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+
+  transactionDetailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: hp(1),
+  },
+
+  typeText: {
+    color: "#A3AFA3",
+    fontSize: 14,
+  },
+
+  dateText: {
+    color: "#A3AFA3",
+    fontSize: 14,
   },
 });
 

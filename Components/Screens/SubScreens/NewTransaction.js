@@ -4,14 +4,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  KeyboardAvoidingView,
-  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import React, { useState, useEffect, useContext } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { hp, wp } from "../../../utils/Common";
-import { getWallets ,getWalletById,updateWallet} from "../../../utils/WalletUtils";
+import { getWallets, getWalletById, updateWallet } from "../../../utils/WalletUtils";
 import { getAuth } from "firebase/auth";
 import { addTransaction } from "../../../utils/TransactionUtils";
 import { useNavigation } from "@react-navigation/native";
@@ -25,311 +23,257 @@ const NewTransaction = () => {
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [description, setDescription] = useState("");
-  // const [walletData, setWalletData] = useState([]);
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  // const [selectedWallet, setSelectedWallet] = useState(null);
+
   const navigation = useNavigation();
   const uid = getAuth().currentUser?.uid;
   const { walletname } = useContext(SelectedWalletContext);
-  console.log("CTX WALLET IN NEW TXN:", walletname);
-  console.log("CTX WALLET ID:", walletname?.id);
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!uid) return;
-      const data = await getWallets(uid);
-      setWalletData(data);
-    };
-    fetchData();
-  }, [uid]);
 
-  // CONDITIONAL RENDERING OF THE WALLET NAMES
-  // const renderWalletDropdown = () => {
-  //   if (!isDropdownVisible) return null;
-
-  //   return (
-  //     <View style={styles.dropdown}>
-  //       {walletData.map((wallet) => (
-  //         <TouchableOpacity
-  //           key={wallet.id}
-  //           style={styles.walletItem}
-  //           onPress={() => {
-  //             setSelectedWallet(wallet);
-  //             setIsDropdownVisible(false);
-  //           }}
-  //         >
-  //           <Text>{wallet.name}</Text>
-  //         </TouchableOpacity>
-  //       ))}
-  //     </View>
-  //   );
-  // };
-
-  // ADDING THE NEW TRANSACTION
-  // const newTransaction = async () => {
-  //   try {
-  //     const wallet = await getWallets(uid, walletname.id);
-  //     let currentBalance = Number(wallet.currentBalance);
-  //     let totalIncome = Number(wallet.totalIncome);
-  //     let totalExpense = Number(wallet.totalExpense);
-
-  //     if (!walletname.id) {
-  //       console.warn("No wallet selected");
-  //       return;
-  //     }
-
-  //     const TransactionData = {
-  //       typename: type,
-  //       Amount: amount,
-  //       Category: category,
-  //       // wallet: selectedWallet,
-  //       Datetransaction: date,
-  //       Description: description,
-  //     };
-  //     if (typename == "Expense" && amount <= totalbalance) {
-  //       totalExpense += amount;
-
-  //       currentBalance -= amount;
-  //     } else {
-  //       totalIncome += amount;
-  //       balance += amount;
-  //       currentBalance += amount;
-  //     }
-  //     await updateWallet(uid, walletname.id, {
-  //       currentBalance,
-  //       totalIncome,
-  //       totalExpense,
-  //     });
-  //     await addTransaction(uid, walletname.id, TransactionData);
-  //     navigation.navigate("Home");
-  //     console.log("Navigated");
-  //   } catch (err) {
-  //     console.error("Error adding transaction:", err);
-  //   }
-  // };
   const newTransaction = async () => {
-  try {
-    if (!walletname?.id) {
-      console.warn("No wallet selected");
-      return;
-    }
-
-    const wallet = await getWalletById(uid, walletname.id);
-
-    let currentBalance = Number(wallet.currentBalance);
-    let totalIncome    = Number(wallet.totalIncome);
-    let totalExpense   = Number(wallet.totalExpense);
-    let txnAmount      = Number(amount);
-
-  
-    if (type === "Expense") {
-      if (txnAmount > currentBalance) {
-        alert("Not enough balance!");
+    try {
+      if (!walletname?.id) {
+        alert("No wallet selected.");
         return;
       }
 
-      currentBalance -= txnAmount;
-      totalExpense   += txnAmount;
-    } else {
-     
-      currentBalance += txnAmount;
-      totalIncome    += txnAmount;
+      const wallet = await getWalletById(uid, walletname.id);
+
+      let currentBalance = Number(wallet.currentBalance);
+      let totalIncome = Number(wallet.totalIncome);
+      let totalExpense = Number(wallet.totalExpense);
+      let txnAmount = Number(amount);
+
+      if (!txnAmount) {
+        alert("Enter a valid amount!");
+        return;
+      }
+
+      if (type === "Expense") {
+        if (txnAmount > currentBalance) {
+          alert("Insufficient balance!");
+          return;
+        }
+        currentBalance -= txnAmount;
+        totalExpense += txnAmount;
+      } else {
+        currentBalance += txnAmount;
+        totalIncome += txnAmount;
+      }
+
+      const TransactionData = {
+        typename: type,
+        Amount: txnAmount,
+        Category: category,
+        Datetransaction: date,
+        Description: description,
+      };
+
+      await updateWallet(uid, walletname.id, {
+        currentBalance,
+        totalIncome,
+        totalExpense,
+      });
+
+      await addTransaction(uid, walletname.id, TransactionData);
+
+      navigation.navigate("Home");
+    } catch (err) {
+      console.error("Error adding transaction:", err);
     }
-
-  
-    const TransactionData = {
-      typename: type,
-      Amount: txnAmount,
-      Category: category,
-      Datetransaction: date,
-      Description: description,
-    };
-
- 
-    await updateWallet(uid, walletname.id, {
-      currentBalance,
-      totalIncome,
-      totalExpense,
-    });
-    
-
-    await addTransaction(uid, walletname.id, TransactionData);
-
-    navigation.navigate("Home");
-    console.log("Transaction added and wallet updated ✔️");
-
-  } catch (err) {
-    console.error("Error adding transaction:", err);
-  }
-};
-
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}>Add Transaction</Text>
 
-      {/* TYPE SECTION */}
-      <Text style={styles.label}>Type</Text>
-      <View style={styles.picker}>
-        <Picker
-          style={{ color: "white" }}
-          selectedValue={type}
-          onValueChange={(value) => setType(value)}
+      {/* CARD */}
+      <View style={styles.card}>
+        {/* TYPE */}
+        <Text style={styles.label}>Type</Text>
+        <View style={styles.pickerContainer}>
+           <Picker
+            selectedValue={type}
+            onValueChange={setType}
+            dropdownIconColor="#C8E5CE"
+            style={styles.picker}
+          > 
+            <Picker.Item label="Expense" value="Expense" color="#1e5d54ff" />
+            <Picker.Item label="Income" value="Income" color="#1e5d54ff"  />
+          </Picker>
+        </View> 
+
+        {/* AMOUNT */}
+        <Text style={styles.label}>Amount</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter amount"
+          placeholderTextColor="#777"
+          keyboardType="numeric"
+          value={amount}
+          onChangeText={setAmount}
+        />
+
+        {/* CATEGORY */}
+        <Text style={styles.label}>Category</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter category"
+          placeholderTextColor="#777"
+          value={category}
+          onChangeText={setCategory}
+        />
+
+        {/* DATE */}
+        <Text style={styles.label}>Date</Text>
+        <TouchableOpacity
+          style={styles.selector}
+          onPress={() => setDatePickerVisibility(true)}
         >
-          <Picker.Item label="Expense" value="Expense" />
-          <Picker.Item label="Income" value="Income" />
-        </Picker>
+          <Text style={styles.selectorText}>{date.toDateString()}</Text>
+        </TouchableOpacity>
+
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={(selectedDate) => {
+            setDate(selectedDate);
+            setDatePickerVisibility(false);
+          }}
+          onCancel={() => setDatePickerVisibility(false)}
+          date={date}
+        />
+
+        {/* DESCRIPTION */}
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={styles.descInput}
+          placeholder="Optional description"
+          placeholderTextColor="#777"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
+
+        {/* BUTTON */}
+        <TouchableOpacity style={styles.addButton} onPress={newTransaction}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* AMOUNT SECTION */}
-      <Text style={styles.label}>Amount</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter amount"
-        keyboardType="numeric"
-        value={amount}
-        onChangeText={setAmount}
-      />
-
-      {/* Category SECTION */}
-      <Text style={styles.label}>Category</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter category"
-        value={category}
-        onChangeText={setCategory}
-      />
-
-      {/* ADDD SECTION FOR THE SELECTING WALLETS */}
-      {/* <Text style={styles.label}>Wallet</Text>
-
-      <TouchableOpacity
-        style={styles.selector}
-        onPress={() => setIsDropdownVisible(!isDropdownVisible)}
-      >
-        <Text style={{ color: "white" }}>
-          {selectedWallet?.name || "Select Wallet"}
-        </Text>
-      </TouchableOpacity>
-
-      {renderWalletDropdown()} */}
-
-      {/* SECTION FOR DATE AND TIME */}
-      <Text style={styles.label}>Date</Text>
-      <TouchableOpacity
-        style={styles.selector}
-        onPress={() => setDatePickerVisibility(true)}
-      >
-        <Text style={{ color: "white" }}>{date.toDateString()}</Text>
-      </TouchableOpacity>
-
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        onConfirm={(selectedDate) => {
-          setDate(selectedDate);
-          setDatePickerVisibility(false);
-        }}
-        onCancel={() => setDatePickerVisibility(false)}
-        date={date}
-      />
-
-      {/* DESCRIOTION SECTION */}
-      <Text style={styles.label}>Description</Text>
-      <TextInput
-        style={styles.descinput}
-        placeholder="Enter Description(optional)"
-        value={description}
-        onChangeText={setDescription}
-      />
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText} onPress={newTransaction}>
-          Add
-        </Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    backgroundColor: "#192019",
+    backgroundColor: "#0E0E0E",
+    paddingHorizontal: wp(6),
   },
+
   header: {
-    marginTop: 22,
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#87C184",
-    alignItems: "center",
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#A8F0B0",
+    marginTop: hp(2),
+    marginBottom: hp(3),
+    textAlign: "center",
   },
-  label: {
-    marginTop: 10,
-    fontWeight: "bold",
-    color: "#415B46",
-    fontSize: 18,
-  },
-  dropdown: {
-    marginTop: 5,
-    borderWidth: 1,
-    borderColor: "#aaa",
-    borderRadius: 6,
-    backgroundColor: 'rgba(174, 244, 166, 1)"',
+
+  card: {
+    backgroundColor: "#161A16",
+    borderRadius: 16,
+    padding: wp(5),
+
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 6,
+
+    borderWidth: 1,
+    borderColor: "#1F281F",
   },
-  walletItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+
+  label: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#C8E5CE",
+    marginTop: hp(1.5),
   },
+
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#2B332B",
+    backgroundColor: "#1F241F",
+    borderRadius: 10,
+    marginTop: 8,
+  },
+
   picker: {
-    borderWidth: 1,
-    borderColor: "#87C184",
-    // padding:,
-    borderRadius: 8,
-    marginTop: 5,
-    color: "white",
+    height: hp(8),
+    color: "#E3FFE8",
   },
+
   input: {
+    height: hp(5.5),
     borderWidth: 1,
-    borderColor: "#87C184",
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 5,
-    color: "white",
+    borderColor: "#2B332B",
+    backgroundColor: "#1F241F",
+    borderRadius: 10,
+    color: "#E3FFE8",
+    paddingHorizontal: wp(3),
+    marginTop: 8,
   },
+
   selector: {
-    padding: 10,
+    height: hp(5.5),
     borderWidth: 1,
-    borderColor: "#87C184",
-    borderRadius: 8,
-    marginTop: 5,
-    color: "white",
+    borderColor: "#2B332B",
+    backgroundColor: "#1F241F",
+    borderRadius: 10,
+    justifyContent: "center",
+    paddingHorizontal: wp(3),
+    marginTop: 8,
   },
-  descinput: {
+
+  selectorText: {
+    color: "#E3FFE8",
+    fontSize: 15,
+  },
+
+  descInput: {
     height: hp(12),
     borderWidth: 1,
-    borderColor: "#87C184",
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 5,
-    color: "white",
-  },
-  addButton: {
-    marginTop: 30,
-    backgroundColor: "#415B48",
-    padding: 15,
+    borderColor: "#2B332B",
+    backgroundColor: "#1F241F",
+    color: "#E3FFE8",
     borderRadius: 10,
-    alignItems: "center",
+    paddingHorizontal: wp(3),
+    paddingTop: hp(1),
+    marginTop: 8,
   },
+
+  addButton: {
+    marginTop: hp(3),
+    backgroundColor: "#2E4333",
+    paddingVertical: hp(1.6),
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
+  },
+
   addButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 18,
+    letterSpacing: 0.5,
   },
 });
+
 export default NewTransaction;
+

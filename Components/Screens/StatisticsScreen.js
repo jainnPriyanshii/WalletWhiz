@@ -1,286 +1,207 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList } from "react-native";
-import React, { useContext, useState,useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
+import React, { useContext, useState, useEffect } from "react";
 import { hp, wp } from "../../utils/Common";
-import {BarChart} from "react-native-gifted-charts";
-import {SelectedWalletContext} from '../../Context/SelectedWalletContext';
+import { BarChart } from "react-native-gifted-charts";
+import { SelectedWalletContext } from "../../Context/SelectedWalletContext";
 import { getAuth } from "firebase/auth";
-import {getTransactions} from '../../utils/TransactionUtils';
+import { getTransactions } from "../../utils/TransactionUtils";
 
-const StatisticsScreen = ()=> {
+const StatisticsScreen = () => {
   const uid = getAuth().currentUser?.uid;
-const { walletname } = useContext(SelectedWalletContext);
-const [selected, setSelected] = useState("Weekly");
-const tabs = ["Weekly", "Monthly", "Yearly"];
-const [allTxns, setAllTxns] = useState([]);
-let weeklyTxns = [];
-let monthlyTxns = [];
-let yearlyTxns = [];
-let filteredTxns = [];
+  const { walletname } = useContext(SelectedWalletContext);
 
+  const [selected, setSelected] = useState("Weekly");
+  const tabs = ["Weekly", "Monthly", "Yearly"];
+  const [allTxns, setAllTxns] = useState([]);
 
+  useEffect(() => {
+    const fetchAllTxns = async () => {
+      if (!uid || !walletname?.id) return;
 
-useEffect(() => {
-  const fetchAllTxns = async () => {
-    if (!uid || !walletname?.id) return;
+      const txns = await getTransactions(uid, walletname.id);
 
-    const txns = await getTransactions(uid, walletname.id);
+      const enhanced = txns.map((tx) => ({
+        ...tx,
+        dateObj: tx.Datetransaction.toDate(),
+      }));
 
-    const enhanced = txns.map(tx => ({
-      ...tx,
-      dateObj: tx.Datetransaction.toDate(),
-    }));
+      setAllTxns(enhanced);
+    };
 
-    setAllTxns(enhanced);
-  };
+    fetchAllTxns();
+  }, [walletname]);
 
-  fetchAllTxns();
-}, [walletname]);
+  // DATE FILTERING LOGIC
+  let today = new Date();
+  let currentMonth = today.getMonth();
+  let currentYear = today.getFullYear();
 
+  let dayIndex = today.getDay();
+  let diff = today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1);
+  let weekStart = new Date(today.setDate(diff));
+  let weekEnd = new Date(
+    weekStart.getFullYear(),
+    weekStart.getMonth(),
+    weekStart.getDate() + 6
+  );
 
+  let weeklyTxns = [];
+  let monthlyTxns = [];
+  let yearlyTxns = [];
 
+  allTxns.forEach((tx) => {
+    const txDate = tx.dateObj;
+    if (!txDate) return;
 
-let today   = new Date();
-let currentMonth = today.getMonth();
-let currentYear  = today.getFullYear();
+    if (txDate >= weekStart && txDate <= weekEnd) weeklyTxns.push(tx);
+    if (
+      txDate.getMonth() === currentMonth &&
+      txDate.getFullYear() === currentYear
+    )
+      monthlyTxns.push(tx);
 
+    if (txDate.getFullYear() === currentYear) yearlyTxns.push(tx);
+  });
 
+  let filteredTxns =
+    selected === "Weekly"
+      ? weeklyTxns
+      : selected === "Monthly"
+      ? monthlyTxns
+      : yearlyTxns;
 
-let dayIndex = today.getDay(); 
-let diff     = today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1);
-let weekStart = new Date(today.setDate(diff));
+  let incomeTotal = filteredTxns
+    .filter((tx) => tx.typename === "Income")
+    .reduce((sum, tx) => sum + Number(tx.Amount), 0);
 
-let weekEnd = new Date(
-  weekStart.getFullYear(),
-  weekStart.getMonth(),
-  weekStart.getDate() + 6
-);
+  let expenseTotal = filteredTxns
+    .filter((tx) => tx.typename === "Expense")
+    .reduce((sum, tx) => sum + Number(tx.Amount), 0);
 
-
-
-
-for (let i = 0; i < allTxns.length; i++) {
-  const tx = allTxns[i];
-  const txDate = tx?.dateObj;
-
-  if (!txDate) continue;
-
-
-  
-  if (txDate >= weekStart && txDate <= weekEnd) {
-    weeklyTxns.push(tx);
-  }
-
-
-
-  if (
-    txDate.getMonth() === currentMonth &&
-    txDate.getFullYear() === currentYear
-  ) {
-    monthlyTxns.push(tx);
-  }
-
-
-
-  if (txDate.getFullYear() === currentYear) {
-    yearlyTxns.push(tx);
-  }
-}
-
-
-
-
-if (selected === "Weekly") filteredTxns = weeklyTxns;
-if (selected === "Monthly") filteredTxns = monthlyTxns;
-if (selected === "Yearly") filteredTxns = yearlyTxns;
-
-
-
-let incomeTxns  = filteredTxns.filter(tx => tx.typename === "Income");
-let expenseTxns = filteredTxns.filter(tx => tx.typename === "Expense");
-
-
-let incomeTotal = 0;
-for (let i = 0; i < incomeTxns.length; i++) {
-  incomeTotal += Number(incomeTxns[i].Amount);
-}
-
-let expenseTotal = 0;
-for (let i = 0; i < expenseTxns.length; i++) {
-  expenseTotal += Number(expenseTxns[i].Amount);
-}
-
-
-
-console.log("WEEKLY TXNS ===>", weeklyTxns);
-console.log("MONTHLY TXNS ===>", monthlyTxns);
-console.log("YEARLY TXNS ===>", yearlyTxns);
-
-console.log("INCOME TOTAL =", incomeTotal);
-console.log("EXPENSE TOTAL =", expenseTotal);
-
-
-  // const barData = [
-  //       {
-  //         value: 40,
-  //         label: 'Jan',
-  //         spacing: 2,
-  //         labelWidth: 30,
-  //         labelTextStyle: {color: 'gray'},
-  //         frontColor: '#177AD5',
-  //       },
-  //       {value: 20, frontColor: '#ED6665'},
-  //       {
-  //         value: 50,
-  //         label: 'Feb',
-  //         spacing: 2,
-  //         labelWidth: 30,
-  //         labelTextStyle: {color: 'gray'},
-  //         frontColor: '#177AD5',
-  //       },
-  //       {value: 40, frontColor: '#ED6665'},
-  //       {
-  //         value: 75,
-  //         label: 'Mar',
-  //         spacing: 2,
-  //         labelWidth: 30,
-  //         labelTextStyle: {color: 'gray'},
-  //         frontColor: '#177AD5',
-  //       },
-  //       {value: 25, frontColor: '#ED6665'},
-  //       {
-  //         value: 30,
-  //         label: 'Apr',
-  //         spacing: 2,
-  //         labelWidth: 30,
-  //         labelTextStyle: {color: 'gray'},
-  //         frontColor: '#177AD5',
-  //       },
-  //       {value: 20, frontColor: '#ED6665'},
-  //       {
-  //         value: 60,
-  //         label: 'May',
-  //         spacing: 2,
-  //         labelWidth: 30,
-  //         labelTextStyle: {color: 'gray'},
-  //         frontColor: '#177AD5',
-  //       },
-  //       {value: 40, frontColor: '#ED6665'},
-  //       {
-  //         value: 65,
-  //         label: 'Jun',
-  //         spacing: 2,
-  //         labelWidth: 30,
-  //         labelTextStyle: {color: 'gray'},
-  //         frontColor: '#177AD5',
-  //       },
-  //       {value: 30, frontColor: '#ED6665'},
-  //     ];
   const barData = [
-{ value: incomeTotal, label: "Income", frontColor: "#4CAF50" ,label:'income',labelWidth: 30 , labelTextStyle: {color: 'gray'}},
-  { value: expenseTotal, label: "Expense", frontColor: "#FF5252",label:'expense' ,labelWidth: 30 , labelTextStyle: {color: 'gray'}}
+    {
+      value: incomeTotal,
+      label: "Income",
+      frontColor: "#4CAF50",
+      labelWidth: 60,
+      labelTextStyle: { color: "#bbb" },
+    },
+    {
+      value: expenseTotal,
+      label: "Expense",
+      frontColor: "#FF5252",
+      labelWidth: 60,
+      labelTextStyle: { color: "#bbb" },
+    },
   ];
-
-
 
   return (
     <View style={styles.container}>
       <Text style={styles.HeadText}>Statistics</Text>
+
+      {/* TABS */}
       <View style={styles.tabs}>
         {tabs.map((tab) => (
           <TouchableOpacity
             key={tab}
             onPress={() => setSelected(tab)}
-            style={[
-              styles.tabItem,
-              selected === tab && styles.activeTabItem,
-            ]}
+            style={[styles.tabItem, selected === tab && styles.activeTabItem]}
           >
             <Text
-              style={[
-                styles.tabsText,
-                selected === tab && styles.activeTabText,
-              ]}
+              style={[styles.tabsText, selected === tab && styles.activeTabText]}
             >
               {tab}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
-<View style={styles.chartContainer}>
-  {barData.length > 0 ? (
-      <BarChart data={barData}
-          barWidth={40}
-          spacing={24}
-          // roundedTop
-          // roundedBottom
-          // hideRules
-          xAxisThickness={0}
-          yAxisThickness={0}
-          yAxisTextStyle={{color: 'gray'}}
-          noOfSections={3}
-          maxValue={75}
-  />) : (
-    <View style={styles.noChart}></View>
-  )}
 
-</View>
-<View style={styles.transactionContainer}>
-  <Text style={styles.transactionText}>Transactions</Text>
-  <FlatList
-    data={filteredTxns}
-    keyExtractor={(item, index) => item.id || index.toString()}
-    renderItem={({ item }) => (
-      <View style={styles.transactionItem}>
-        <View style={styles.transactionInfo}>
-          <Text style={styles.transactionCategory}>{item.Category || 'N/A'}</Text>
-          <Text style={styles.transactionDate}>
-            {item.dateObj?.toLocaleDateString() || 'No date'}
-          </Text>
-        </View>
-        <Text style={[
-          styles.transactionAmount,
-          { color: item.typename === 'Income' ? '#4CAF50' : '#FF5252' }
-        ]}>
-          {item.typename === 'Income' ? '+' : '-'}₹{item.Amount}
-        </Text>
+      {/* CHART CARD */}
+      <View style={styles.chartCard}>
+        {barData.length ? (
+          <BarChart
+            data={barData}
+            barWidth={45}
+            spacing={40}
+            xAxisThickness={0}
+            yAxisThickness={0}
+            noOfSections={4}
+            maxValue={Math.max(incomeTotal, expenseTotal) + 20}
+            yAxisTextStyle={{ color: "#bbb" }}
+          />
+        ) : (
+          <Text style={styles.emptyText}>No data available</Text>
+        )}
       </View>
-    )}
-    ListEmptyComponent={() => (
-      <Text style={styles.emptyText}>No transactions found</Text>
-    )}
-    style={styles.flatList}
-  />
-</View>
 
+      {/* TRANSACTIONS */}
+      <View style={styles.transactionContainer}>
+        <Text style={styles.transactionText}>Transactions</Text>
 
-</View>
+        <FlatList
+          data={filteredTxns}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.transactionCard}>
+              <View>
+                <Text style={styles.transactionCategory}>
+                  {item.Category || "N/A"}
+                </Text>
+                <Text style={styles.transactionDate}>
+                  {item.dateObj?.toLocaleDateString() || "No date"}
+                </Text>
+              </View>
+
+              <Text
+                style={[
+                  styles.transactionAmount,
+                  {
+                    color:
+                      item.typename === "Income" ? "#4CAF50" : "#FF5252",
+                  },
+                ]}
+              >
+                {item.typename === "Income" ? "+" : "-"}₹{item.Amount}
+              </Text>
+            </View>
+          )}
+          ListEmptyComponent={() => (
+            <Text style={styles.emptyText}>No transactions found</Text>
+          )}
+        />
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#192019",
+    backgroundColor: "#0E0E0E",
     alignItems: "center",
   },
 
   HeadText: {
-    fontSize: 24,
-    color: "#edede9",
-    marginTop: hp(5),
-    letterSpacing: wp(0.5),
-    fontWeight: "bold",
+    fontSize: 26,
+    color: "#E3FFE8",
+    marginTop: hp(4),
+    fontWeight: "700",
+    letterSpacing: 1,
   },
 
   tabs: {
-    backgroundColor: "#353535",
+    backgroundColor: "#1C1F1C",
     width: wp(90),
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    height: hp(5),
-    borderRadius: 25,
-    marginTop: hp(2),
+    height: hp(5.5),
+    borderRadius: 30,
+    marginTop: hp(2.5),
     padding: 4,
   },
 
@@ -288,100 +209,95 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    height: "100%",
     borderRadius: 20,
   },
 
   activeTabItem: {
-    backgroundColor: "#edede9",
+    backgroundColor: "#2E4333",
   },
 
   tabsText: {
-    color: "#edede9",
-    fontWeight: "bold",
+    color: "#bbb",
+    fontWeight: "600",
+    fontSize: 14,
   },
 
   activeTabText: {
-    color: "#000",
+    color: "#E3FFE8",
+    fontWeight: "700",
   },
 
-  chartContainer:{
-position:'relative',
-marginTop:hp(3),
-// height:wp(25),
-justifyContent:'center',
-// alignItems:'center'
+  chartCard: {
+    backgroundColor: "#161A16",
+    width: wp(90),
+    borderRadius: 18,
+    paddingVertical: hp(2),
+    marginTop: hp(3),
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#1F281F",
+
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
   },
 
-  noChart:{
-  backgroundColor:'black',
-  heaight:hp(20)
-  },
-  
-  // transactionText:{
-  //   fontSize: 20,
-  //   color: "#edede9",
-  //   marginTop:hp(2),
-  //   letterSpacing: wp(0.3),
-  //   fontWeight: "bold",
-  //   marginLeft:wp(-42)
-
-  // },
   transactionContainer: {
-  width: wp(90),
-  marginTop: hp(3),
-  flex: 1,
-},
+    width: wp(90),
+    marginTop: hp(3),
+    flex: 1,
+  },
 
-transactionText: {
-  fontSize: 20,
-  color: "#edede9",
-  marginBottom: hp(2),
-  letterSpacing: wp(0.3),
-  fontWeight: "bold",
-},
+  transactionText: {
+    fontSize: 20,
+    color: "#E3FFE8",
+    fontWeight: "700",
+    marginBottom: hp(2),
+  },
 
-flatList: {
-  flex: 1,
-},
+  transactionCard: {
+    backgroundColor: "#1A1F1A",
+    padding: wp(4),
+    borderRadius: 12,
+    marginBottom: hp(1.5),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
 
-transactionItem: {
-  backgroundColor: '#2a2a2a',
-  padding: wp(4),
-  borderRadius: 10,
-  marginBottom: hp(1.5),
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-},
+    borderWidth: 1,
+    borderColor: "#232A23",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
 
-transactionInfo: {
-  flex: 1,
-},
+  transactionCategory: {
+    color: "#E3FFE8",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 
-transactionCategory: {
-  color: '#edede9',
-  fontSize: 16,
-  fontWeight: '600',
-  marginBottom: 4,
-},
+  transactionDate: {
+    color: "#999",
+    fontSize: 12,
+    marginTop: 2,
+  },
 
-transactionDate: {
-  color: '#999',
-  fontSize: 12,
-},
+  transactionAmount: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
 
-transactionAmount: {
-  fontSize: 18,
-  fontWeight: 'bold',
-},
-
-emptyText: {
-  color: '#999',
-  textAlign: 'center',
-  marginTop: hp(5),
-  fontSize: 16,
-}
+  emptyText: {
+    color: "#777",
+    fontSize: 16,
+    textAlign: "center",
+    marginVertical: hp(2),
+  },
 });
 
 export default StatisticsScreen;
