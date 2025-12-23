@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import OnBoardScreen from "../WalletWhiz/Components/Screens/OnBoardScreen";
-import LoginScreen from "../WalletWhiz/Components/Screens/LoginScreen";
-import RegisterScreen from "../WalletWhiz/Components/Screens/RegisterScreen";
+import OnBoardScreen from "./Components/Screens/OnBoardScreen";
+import LoginScreen from "./Components/Screens/LoginScreen";
+import RegisterScreen from "./Components/Screens/RegisterScreen";
 import MyTabs from "../WalletWhiz/BottomTabs/BottomTabs";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../WalletWhiz/WalletWhiz/firebaseConfig";
